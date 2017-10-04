@@ -1,0 +1,95 @@
+{% extends "skip_logic/base.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block head_title %}{% if "new" in request.path %}Create Question{% else %}Edit Question{% endif %}{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{% url 'skip_logic:survey_index' %}" class="w3-round w3-hover-pale-blue">
+My Surveys</a> > 
+{% if "new" in request.path %}
+<a href="{% url 'skip_logic:survey_detail' page.survey.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-list-alt" aria-hidden="true"></i> <strong>{{ page.survey.title }}</strong></a> > 
+<a href="{% url 'skip_logic:page_detail' page.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-file-o" aria-hidden="true"></i> <strong>{{ page.title }}</strong></a> > 
+{% else %}
+<a href="{% url 'skip_logic:survey_detail' question.page.survey.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-list-alt" aria-hidden="true"></i> <strong>{{ question.page.survey.title }}</strong></a> > 
+<a href="{% url 'skip_logic:page_detail' question.page.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-file-o" aria-hidden="true"></i> <strong>{{ question.page.title }}</strong></a> > 
+{% endif %}
+
+{% if "new" in request.path %}Create Question{% else %}Edit Question{% endif %}
+{% endblock %}
+
+{% block page %}
+
+  <h1 class="w3-center">{% if "new" in request.path %}Create Question{% else %}Edit Question{% endif %}</h1>
+
+  <div class="w3-card w3-light-grey w3-padding w3-margin">
+    <form method="POST" id="form_edit" name="form_edit">
+      {% csrf_token %}
+      <table class="w3-table">
+        <tr>
+          <td style="width:30%;">
+            <label for="id_question_text"><strong>Question text:</strong></label>
+            <small><p>Text entered here shows on the survey page as the question body.</small></p>
+          </td>
+          <td>
+            {{ form.question_text }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="id_question_number"><strong>Question number:</strong></label>
+            <p><small>Must be unique within page; determines default question order.</small></p>          <td>
+            {{ form.question_number }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="id_slug"><strong>URL Slug:</strong></label> 
+            <p><small>Must be unique within page; forms part of survey taking URLs.</small></p>
+          </td>
+          <td>
+            {{ form.slug }}
+          &nbsp;<div id="randomize_slug" class="w3-button w3-border w3-hover-shadow w3-round-large w3-margin-left">Randomize Slug</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="id_layout_horizontal">Layout horizontal:</label>
+          </td>
+          <td>
+            {{ form.layout_horizontal }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="id_required">Required:</label>
+          </td>
+          <td>
+            {{ form.required }}
+          </td>
+        </tr>
+      </table>
+      <div style="text-align:right;">
+        <a href={% if 'new' in request.path %}
+                  "{% url 'skip_logic:page_detail' page.slug %}"
+                {% else %}
+                  "{% url 'skip_logic:question_detail' question.slug %}"
+                {% endif %}
+           class="w3-margin w3-button w3-border w3-hover-shadow w3-round-large">
+          <i class="fa fa-undo" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+        </a>
+        <button type="submit" class="w3-margin w3-button-blue">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+        </button>
+      </div>
+    </form>
+  </div>
+
+{% include "skip_logic/slug_script.html" %}
+
+{% endblock %}

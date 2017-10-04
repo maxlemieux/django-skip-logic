@@ -1,0 +1,34 @@
+<script type="text/javascript">
+{% comment %}
+https://stackoverflow.com/questions/16851287/random-with-8-alphanumeric-characters
+{% endcomment %}
+
+function randomString(length, chars) {
+  var mask = '';
+  if (chars.indexOf('a') > -1) mask += 'abcdefghijklmnopqrstuvwxyz';
+  if (chars.indexOf('A') > -1) mask += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if (chars.indexOf('#') > -1) mask += '0123456789';
+  var result = '';
+  for (var i = length; i > 0; --i)
+     result += mask[Math.round(Math.random() * (mask.length - 1))];
+  return result;
+};
+
+function init() {
+  var button = document.getElementById("randomize_slug");
+  this_form = document.forms['form_edit'];
+  this_form_slug = this_form.elements["slug"];
+  if(button.addEventListener){
+    button.addEventListener("click", function() { $('#id_slug').val(randomString(8, '#aA')); }, false);
+  } else if(button.attachEvent){
+    button.attachEvent("onclick", function() { $('#id_slug').val(randomString(8, '#aA')); }, false);
+  }
+};
+if(window.addEventListener){
+    window.addEventListener("load", init, false);
+} else if(window.attachEvent){
+    window.attachEvent("onload", init);
+} else{
+   document.addEventListener("load", init, false);
+}
+</script>

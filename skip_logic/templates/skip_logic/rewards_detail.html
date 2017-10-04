@@ -1,0 +1,28 @@
+{% extends "skip_logic/base.html" %}
+{% block page %}
+    <div class="w3-container">
+
+These rewards are so amazing, you'll want to sign up right this moment.
+
+{% comment %}
+        <header>
+            <h1>Reward Shop</h1>
+        </header>
+<h2 class="w3-center ">Avatar Items</h2>
+    <div class="w3-container w3-display-container w3-padding w3-light-grey" style="margin: auto; width: 80%;">
+{% for reward in reward_list %}
+        <div class="w3-black w3-center w3-margin w3-padding" style="height: 200px; width: 200px; float: left;">
+            {{ reward.reward_text }}<br />
+            {{ reward.reward_cost }}<br/>
+            {{ reward.price_silver }}<br/><br/>
+            <div class="w3-border w3-round" style="margin:auto;" id="{{ reward.reward_avataritem.item_image_css_id }}">
+            <p style="display:block;">&nbsp;</p>
+            </div>
+        </div>
+{% endfor %}
+    </div>
+{% endcomment %}
+    </div>
+
+
+{% endblock %}

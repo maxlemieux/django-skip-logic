@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="{% static 'css/w3.css' %}">
+    <link rel="stylesheet" href="{% static 'css/w3-colors-windows.css' %}">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'jstree/jstree-style.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/skiplogic.css' %}" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:thin,regular,bold" rel="stylesheet"> 
+
+    <script type="text/javascript" src="{% static 'Chart.bundle.js' %}"></script>
+    <script type="text/javascript" src="{% static 'Chart.utils.js' %}"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="{% static 'jstree/jstree.min.js' %}"></script>
+
+    <title>{% if SITE_NAME %}{{ SITE_NAME }} - {% endif %}{% block head_title %}{% endblock %}</title>
+  </head>
+
+  <body>
+    <div id="wrap">
+      <div id="header_fixed">
+        {% include "skip_logic/header.html" %}
+
+        <div class="w3-bar w3-blue" id="breadcrumbbar" style="padding-left:20px; padding-right:20px; padding-top:5px;padding-bottom:5px;">
+          {% block breadcrumbs %}{% endblock %}
+        </div><!-- w3-bar w3-blue -->
+      </div>
+
+      {% comment %}Magic number 76 is the height of the amber header+blue breadcrumbs.{% endcomment %}
+      <div class="w3-row-padding" style="margin-top:76px;">
+
+      {% if request.user.is_authenticated %}
+        {% if 'surveys' in request.path or 'analytics' in request.path or 'campaign' in request.path %}
+        <div class="w3-col w3-container" style="width:30%; padding-top:46px;">
+          {% include "skip_logic/jstree.html" %}
+        </div>
+          {% endif %}
+        {% endif %}
+
+        <div class="w3-rest w3-container">
+
+          {% if messages %}
+            {% for message in messages %}
+            <div id="messagediv" class="w3-padding w3-margin w3-border w3-pale-blue {% if message.extra_tags %}{{ message.extra_tags }}{% endif %}">
+              <span class="w3-text-dark-grey closebtn" onclick="$('#messagediv').slideUp();">&times;</span>
+              {{ message }}
+            </div>
+            {% endfor %}
+          {% endif %}
+
+          {% block index %}{% endblock %}
+          {% block page %}{% endblock %}
+        </div>
+      </div><!-- w3-row-padding -->
+
+    </div><!-- id="wrap" -->
+
+    <div id="footer">
+      {% include "skip_logic/footer.html" %}
+    </div><!-- id="footer" -->
+
+    <div id="overlay" class="w3-opacity-max w3-center w3-display-container">
+      <div class="w3-display-middle">
+        <h1><div id="phrase">Loading...</div></h1>
+        <h1><i class="fa fa-cog fa-spin fa-3x fa-fw"></i></h1>
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+
+{% include "skip_logic/phrase_script.html" %}
+{% comment %}
+    <script type="text/javascript">
+      function showOverlay() {
+        document.getElementById('overlay').style.display = "block";
+      };
+
+      $(document).ready(function() {
+        function setRandomPhrase() {
+          // Set phrases into an array
+          var phrases = new Array(
+            "Chasing down pages that the wind blew away",
+            "Trying to find a pen that's not out of ink",
+            "Discovering duplicated questions",
+            "Considering clarifying certain choices",
+            "Clearing paths through berry bushes",
+            "Asking random people on the sidewalk"
+          );
+
+          // Selects a random phrase
+          var random = Math.floor(Math.random()*phrases.length);
+
+          while (phrases[random] == $("#phrase").text())
+            {
+               var random = Math.floor(Math.random()*phrases.length);
+            }
+          // Sets the area to use that random phrase
+          $("#phrase").fadeOut('slow',function(){$("#phrase").text(phrases[random]).fadeIn('slow')});
+        }
+
+        // Fire the function every 5 seconds...
+        setInterval(setRandomPhrase,5000);
+
+        $( window ).on("unload", function() {
+          $('#overlay').fadeOut(1000);
+        });
+        $('#overlay').hide();
+
+      });
+    </script>
+{% endcomment %}
+
+  </body>
+</html>
+

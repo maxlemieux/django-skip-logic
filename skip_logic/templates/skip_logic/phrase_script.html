@@ -1,0 +1,48 @@
+<script type="text/javascript">
+function showOverlay() {
+  document.getElementById('overlay').style.display = "block";
+  setRandomPhrase();
+};
+
+$(document).ready(function() {
+
+  function setRandomPhrase() {
+    // Set phrases into an array
+    var phrases = new Array(
+      "Chasing down pages that the wind blew away...",
+      "Trying to find a pen that's not out of ink...",
+      "Discovering duplicated questions...",
+      "Considering clarifying certain choices...",
+      "Clearing paths through berry bushes...",
+      "Asking random people on the sidewalk...",
+      "Practicing Silly Walks...",
+      "Analyzing low ping advantages...",
+      "Skipping merrily through the logic fields...",
+      "Taking a nap...",
+      "Considering inserting subliminal messaging...",
+      "Assembling temporo-spatial path diagrams...",
+      "Monitoring navigation tree hydroponic systems",
+    );
+
+    // Selects a random phrase
+    var random = Math.floor(Math.random()*phrases.length);
+
+    while (phrases[random] == $("#phrase").text())
+      {
+         var random = Math.floor(Math.random()*phrases.length);
+      }
+    // Sets the area to use that random phrase
+    $("#phrase").fadeOut('fast',function(){$("#phrase").text(phrases[random]).fadeIn('fast')});
+
+    setTimeout(setRandomPhrase, 1000);
+  };
+
+  setRandomPhrase();
+
+  $( window ).on("unload", function() {
+    $('#overlay').fadeOut(1000);
+  });
+  $('#overlay').hide();
+
+});
+</script>

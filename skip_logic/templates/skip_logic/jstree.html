@@ -1,0 +1,122 @@
+<div id="jstree_div_wrapper">
+  {% if '/surveys/analytics/' in request.path %}
+    <strong><a href="{% url 'skip_logic:results_index' %}">Analytics</a></strong>
+  {% elif '/surveys/' in request.path %}
+    <strong><a href="{% url 'skip_logic:survey_index' %}">Surveys</a></strong>
+  {% elif '/campaign/' in request.path %}
+    <strong>Campaigns</strong>
+  {% else %}
+    <strong>Site Menu</strong>
+  {% endif %}
+
+<div id="jstree_div" style="overflow:hidden;" class="w3-text-dark-grey">
+  {% if '/surveys/analytics/' in request.path %}
+    <ul>
+      {% for tree_survey in survey_list %}
+        <li data-jstree='{"icon":"fa fa-bar-chart"}'
+            class="{% if survey == tree_survey %}jstree-open{% endif %}">
+          <a href="{% url 'skip_logic:survey_results' tree_survey.slug %}"
+             class="{% if survey == tree_survey %}jstree-clicked{% endif %}">{{ tree_survey }}</a>
+          <ul>
+            {% for tree_page in tree_survey.page_survey.all %}
+              <li data-jstree='{"icon":"fa fa-file-o"}' class="jstree-open">
+                <a href="#q_{{ tree_page.question_page.all.0.slug }}">
+                  {{ tree_page }}
+                </a>
+                <ul>
+                  {% for tree_question in tree_page.question_page.all %}
+                    <li data-jstree='{"icon":"fa fa-question-circle-o"}'>
+                      <a href="{% url 'skip_logic:survey_results' tree_survey.slug %}#q_{{ tree_question.slug }}">{{ tree_question|truncatechars:30 }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+               </li>
+            {% endfor %}
+          </ul>
+        </li>
+      {% endfor %}
+    </ul>
+  {% elif '/campaign/' in request.path %}
+    <ul>
+      {% for tree_campaign in campaign_list %}
+      <li>
+        <a class="{% if campaign == tree_campaign %}jstree-clicked{% endif %}"
+           href="{% url 'skip_logic:campaign_detail' tree_campaign.id %}">
+           {{ tree_campaign.name|truncatechars:30 }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+
+  {% elif '/surveys/' in request.path %}
+    <ul>
+      {% for tree_survey in my_surveys %}
+        <li data-jstree='{"icon":"fa fa-list-alt"}' 
+            class="{% if survey == tree_survey %}jstree-open{% endif %}">
+          <a href="{% url 'skip_logic:survey_detail' tree_survey.slug %}" 
+             class="{% if survey == tree_survey %}jstree-clicked{% endif %}">{{ tree_survey.title }}</a>
+          <ul>
+            {% for tree_page in tree_survey.page_survey.all %}
+              <li data-jstree='{"icon":"fa fa-file-o"}' 
+                  class="{% if page == tree_page %}jstree-open{% endif %}">
+                <a href="{% url 'skip_logic:page_detail' tree_page.slug %}" 
+                   class="{% if page == tree_page %}jstree-clicked{% endif %}">{{ tree_page.title|truncatechars:35 }}</a>
+                <ul>
+                  {% for tree_question in tree_page.question_page.all %}
+                    <li data-jstree='{"icon":"fa fa-question-circle-o"}' 
+                        class="{% if question == tree_question %}jstree-open{% endif %}">
+                      <a href="{% url 'skip_logic:question_detail' tree_question.slug %}" 
+                         class="{% if question == tree_question %}jstree-clicked{% endif %}">{{ tree_question.question_text|truncatechars:30 }}</a>
+                      <ul>
+                        {% for tree_choice in tree_question.choice_question.all %}
+                          <li data-jstree='{"icon":"{% if tree_choice.input_field %}fa fa-edit{% else %}fa fa-dot-circle-o{% endif %}"}'
+                              class="{% if choice == tree_choice %}jstree-open{% endif %}">>
+                            <a href="{% url 'skip_logic:choice_detail' tree_choice.slug %}"
+                               class="{% if choice == tree_choice %}jstree-clicked{% endif %}">{{ tree_choice.choice_text|truncatechars:25 }}</a>
+                            <ul>
+                              {% for tree_path in tree_choice.path_choice.all %}
+                              <li data-jstree='{"icon":"fa fa-arrow-right"}'>
+                                <a href="{% url 'skip_logic:path_detail' tree_path.slug %}"
+                                   class="{% if path == tree_path %}jstree-clicked{% endif %}">{{ tree_path|truncatechars:20 }}</a>
+                              </li>
+                              {% endfor %}
+                            </ul>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </li>
+            {% endfor %}
+          </ul>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div><!--jstree-div-->
+
+</div><!--jstree-div-wrapper-->
+
+<script type="text/javascript">
+$(function () {
+  $.jstree.defaults.core.themes.dots = 'True';
+  $.jstree.defaults.core.dblclick_toggle = 'False';
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#jstree_div')
+    .jstree({
+      "core": {
+        "multiple": false,
+      }
+    })
+    .bind("select_node.jstree", function(e, data) {
+      var href = data.node.a_attr.href;
+      document.location.href = href;
+      console.log("test");
+    });
+});
+</script>

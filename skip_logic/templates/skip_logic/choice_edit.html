@@ -1,0 +1,84 @@
+{% extends "skip_logic/base.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block head_title %}{% if "new" in request.path %}Create Choice{% else %}Edit Choice{% endif %}{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{% url 'skip_logic:survey_index' %}" class="w3-round w3-hover-pale-blue">
+My Surveys</a> > 
+{% if "new" in request.path %}
+<a href="{% url 'skip_logic:survey_detail' question.page.survey.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-list-alt" aria-hidden="true"></i> <strong>{{ question.page.survey.title|truncatechars:30 }}</strong></a> > 
+<a href="{% url 'skip_logic:page_detail' question.page.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-file-o" aria-hidden="true"></i> <strong>{{ question.page.title|truncatechars:30 }}</strong></a> > 
+<a href="{% url 'skip_logic:question_detail' question.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-question-circle-o" aria-hidden="true"></i> <strong>{{ question.question_text }}</strong></a> > 
+{% else %}
+<a href="{% url 'skip_logic:survey_detail' choice.question.page.survey.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-list-alt" aria-hidden="true"></i> <strong>{{ choice.question.page.survey.title|truncatechars:30 }}</strong></a> > 
+<a href="{% url 'skip_logic:page_detail' choice.question.page.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-file-o" aria-hidden="true"></i> <strong>{{ choice.question.page.title|truncatechars:30 }}</strong></a> > 
+<a href="{% url 'skip_logic:question_detail' choice.question.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-question-circle-o" aria-hidden="true"></i> <strong>{{ choice.question.question_text|truncatechars:30 }}</strong></a> > 
+<a href="{% url 'skip_logic:choice_detail' choice.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>{{ choice.choice_text|truncatechars:30 }}</strong></a> > 
+{% endif %}
+
+{% if "new" in request.path %}Create Choice{% else %}Edit Choice{% endif %}
+{% endblock %}
+
+{% block page %}
+
+  <h1 class="w3-center">{% if "new" in request.path %}Create Choice{% else %}Edit Choice{% endif %}</h1>
+
+  <div class="w3-card w3-light-grey w3-padding" style="margin-bottom:20px;">
+    <form method="POST" class="w3-form" id="form_edit" enctype="multipart/form-data">
+      {% csrf_token %}
+      <table class="w3-table">
+        <tr>
+          <td style="width:30%;">
+            <label for="id_choice_text"><strong>Choice Text:</strong></label>
+          </td>
+          <td>{{ form.choice_text }}</td>
+        </tr>
+        <tr>
+          <td>
+            <label for="id_choice_number"><strong>Choice Number:</strong></label>
+            <p><small>Must be unique within question; determines choice order on page.</small></p>
+          </td>
+          <td>{{ form.choice_number }}</td>
+        </tr>
+        <tr>
+          <td><label for="id_slug"><strong>URL Slug:</strong></label></td>
+          <td>{{ form.slug }}&nbsp;<div id="randomize_slug" class="w3-button w3-border w3-hover-shadow w3-round-large w3-margin-left">Randomize Slug</div></td>
+        </tr>
+        <tr>
+          <td><label for="id_choice_image">Image:</label></td>
+          <td>{{ form.choice_image }}</td>
+        </tr>
+        <tr>
+          <td><label for="id_input_field">Input Field:</label></td>
+          <td>{{ form.input_field }}</td>
+        </tr>
+      </table>
+      <div style="text-align:right;">
+        <a href="{% if 'new' in request.path %}
+                   {% url 'skip_logic:question_detail' question.slug %}
+                 {% else %}
+                   {% url 'skip_logic:choice_detail' choice.slug %}
+                 {% endif %}"
+           class="w3-margin w3-button w3-border w3-hover-shadow w3-round-large">
+           <i class="fa fa-undo" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+        </a>
+        <button type="submit" class="w3-margin w3-button-blue">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+        </button>
+      </div>
+    </form>
+  </div>
+
+{% include "skip_logic/slug_script.html" %}
+
+{% endblock %}

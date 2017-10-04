@@ -1,0 +1,45 @@
+{% extends "skip_logic/base.html" %}
+
+{% block head_title %}Analytics{% endblock %}
+
+{% block breadcrumbs %}Analytics{% endblock %}
+
+{% block page %}
+
+<div class="w3-container" style="margin-bottom:92px;">
+  <h1 class="w3-center">Analytics</h1>
+
+  <p class="w3-center">Please choose a survey to view results:</p>
+  <div class="w3-container w3-display-container w3-padding" style="margin: auto; width: 80%;">
+  {% for key, value in respondent_count_dict.items %}
+    <div class="w3-cell-row w3-card w3-light-grey w3-hover-shadow" style="margin-bottom:23px;">
+      <div class="w3-cell" style="width:60%;">
+        <div class=" w3-margin w3-padding">
+
+          <p><a href="{% url 'skip_logic:survey_results' key.slug %}">
+          <strong>{{ key }}</strong></a></p>
+
+          <p><small>Date published: {{ key.pub_date }}</small></p>
+          <p>Respondents: {{ value }}</p>
+
+        {% if request.user.is_superuser %}
+          <p>Author: {{ key.author }}</p>
+        {% endif %}
+
+        </div>
+      </div>
+      <div class="w3-cell w3-cell-middle w3-center">
+        <div class="w3-button-blue">
+          <a style="text-decoration:none;"
+             onclick="showOverlay()" 
+             href="{% url 'skip_logic:survey_results' key.slug %}">
+             <i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;&nbsp;View Results
+          </a>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

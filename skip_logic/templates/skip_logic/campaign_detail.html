@@ -1,0 +1,58 @@
+{% extends "skip_logic/base.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block head_title %}{{ campaign.name }}{% endblock %}
+
+{% block breadcrumbs %}
+<a class="w3-hover-pale-blue w3-round" href="{% url 'skip_logic:campaign_index' %}" style="text-decoration:none;padding:3px;">
+My Campaigns</a> > {{ campaign.name }}
+{% endblock %}
+
+{% block page %}
+
+<div style="margin-bottom:69px;">
+  <h1 class="w3-center">{% trans "Campaign:" %} {{ campaign.name }}</h1>
+
+  <div class="w3-card w3-light-grey w3-margin">
+    <div class="w3-container w3-margin">
+      <h3>Campaign Details:</h3>
+      <p><strong>Created:</strong> {{ campaign.created_date }}</p>
+      <form action="{% url 'skip_logic:campaign_detail' campaign.id %}" method="post">
+        {% csrf_token %}
+        <label for="campaign_name"><strong>Name: </strong></label>
+        <br>
+        <input style="width:100%;" type="text" name="campaign_name" id="campaign_name" value="{{ campaign.name }}" />
+        <br><br>
+        <label for="campaign_description"><strong>Description:</strong> </label>
+        <br>
+        <textarea style="width:100%;" name="campaign_description" id="campaign_description" rows=4 cols=40>{{ campaign.description }}</textarea>
+        <br><br>
+        <input class="w3-right w3-button w3-border w3-round-large" type="submit" value="&#xf0c7;&nbsp;&nbsp;Save Changes" />
+      </form>
+      
+      <div class="w3-container w3-cell-row" style="margin-top:46px;">
+        <div class="w3-left w3-cell">
+          <div class="w3-round w3-sand w3-button w3-border w3-margin">
+            <a style="text-decoration:none;" href="{% url 'skip_logic:campaign_delete' campaign.id %}"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;&nbsp;End Campaign</a>
+          </div>
+        </div>
+        <div class="w3-right w3-cell">
+          <div class="w3-button-blue w3-margin">
+            <a style="text-decoration:none;" href="{% url 'skip_logic:campaign_referral_codes' campaign.id %}"><i class="fa fa-link" aria-hidden="true"></i>&nbsp;&nbsp;Referral Codes</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w3-container w3-center">
+    <div class="w3-button-blue w3-margin">
+      <a style="text-decoration:none;" href="{% url 'skip_logic:campaign_index' %}"><i class="fa fa-undo" aria-hidden="true"></i>&nbsp;&nbsp;Back to My Campaigns</a>
+    </div>
+  </div>
+
+
+</div>
+{% endblock %}

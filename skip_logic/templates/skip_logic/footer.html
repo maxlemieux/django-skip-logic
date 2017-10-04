@@ -1,0 +1,28 @@
+  <div class="w3-hide-small w3-hide-medium">
+    <div class="w3-bar w3-indigo w3-margin-top {% if request.user_agent.is_mobile %}{% else %}{% endif %}">
+      <div class="w3-container">
+        <a href="#" class="w3-bar-item w3-small w3-text-sand" 
+           style="margin-top:10px; text-decoration: none;">Home</a>
+        <a href="#" class="w3-bar-item w3-small w3-text-sand" 
+           style="margin-top:10px; text-decoration: none;">Terms</a>
+        <a href="#" class="w3-bar-item w3-small w3-text-sand" 
+           style="margin-top:10px; text-decoration: none;">Privacy</a>
+      {% if perms.skip_logic.add_survey %}
+        <a href="#" class="w3-bar-item w3-button w3-right w3-sand w3-hover-blue w3-round" 
+           style="margin-top:10px;margin-bottom:10px;"><i class="fa fa-list-alt" aria-hidden="true"></i>&nbsp;&nbsp;Help Center</a>
+      {% else %}
+        <a href="#" class="w3-bar-item w3-button w3-right w3-blue w3-round w3-text-sand" 
+           style="margin-top:10px;margin-bottom:10px;">Try Professional Free</a>
+      {% endif %}
+        <div class="w3-bar-item w3-small" 
+             style="margin-top:10px;">&#169; Copyright 2017 djangoskiplogic.com</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w3-hide-large w3-center">
+    <a href="#" class="w3-bar-item w3-small w3-text-dark-grey" style="margin-top:10px; text-decoration: none;">Home</a>&nbsp;&nbsp;&nbsp;
+    <a href="#" class="w3-bar-item w3-small w3-text-dark-grey" style="margin-top:10px; text-decoration: none;">Terms</a>&nbsp;&nbsp;&nbsp;
+    <a href="#" class="w3-bar-item w3-small w3-text-dark-grey" style="margin-top:10px; text-decoration: none;">Privacy</a>&nbsp;&nbsp;&nbsp;&nbsp;
+    <span class="w3-small w3-text-dark-grey">&#169; Copyright 2017 djangoskiplogic.com</span>
+  </div>

@@ -1,0 +1,141 @@
+{% extends "skip_logic/base.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block head_title %}Referral Codes: {{ campaign.campaign_name }}{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{% url 'skip_logic:campaign_index' %}">
+My Campaigns</a> > 
+<a href="{% url 'skip_logic:campaign_detail' campaign.id %}">
+{{ campaign.name }}</a> > <strong>Referral Codes</strong>
+{% endblock %}
+
+{% block page %}
+
+<div class="w3-container" style="margin-bottom:69px;">
+
+  <h1 class="w3-center">{% trans "Referral Codes:" %} {{ campaign.name }}</h1>
+  <div class="w3-container w3-border w3-round-large w3-light-grey" style="width:60%; margin:auto; margin-top:20px;margin-bottom:20px;">
+    <div class="w3-cell-row">
+      <div class="w3-cell" style="width:10%;">
+      </div>
+      <div class="w3-cell" style="width:80%;">
+        <div class="w3-container" style="width:100%;margin:auto;">
+          <h2><i class="fa fa-link" aria-hidden="true"></i> Create new referral codes:</h2>
+
+          <form id="refcodeform" action="{% url 'skip_logic:campaign_referral_codes' campaign.id %}" method="post">
+            {% csrf_token %}
+            Choose a survey: 
+            <select class="w3-right" name="referral_survey" form="refcodeform">
+              {% for survey in survey_list %}
+              <option value="{{ survey.id }}">{{ survey }}</option>
+              {% endfor %}
+             </select>
+            <br><br>
+            <label for="referral_code_count">Number of codes to create: &nbsp;
+            <input class="w3-right w3-hover-shadow" 
+                   style="text-align:right;" 
+                   type="text" 
+                   name="referral_code_count" 
+                   id="referral_code_count" 
+                   value="100" 
+                   required />
+            </label>
+            <br>
+            (1-1000, 1000 maximum codes per campaign)
+            <div class="w3-margin w3-right"><input class="w3-button-blue" type="submit" value="&#xf067;&nbsp;&nbsp;Create Codes"/></div>
+          </form>
+
+        </div>
+      </div>
+      <div class="w3-cell" style="width:10%;">
+      </div>
+    </div>
+  </div>
+
+{% if referral_codes|length > 0 %}
+  {% for key, values in referral_codes.items %}
+  <div class="w3-card w3-light-grey w3-padding" style="width:80%;margin:auto;margin-bottom:23px;">
+    <div class="w3-container, w3-margin">
+      <h4><strong>Survey:</strong> {{ key }}</h4>
+      <h4><strong>Codes created:</strong> {{ values.count }}/1000</h4>
+        <div class="w3-border" style="width: 100%; height: 200px; overflow-y: scroll;">
+          <table>
+            <tr>
+              <th><a href="?order_by=code">Code</a></th>
+              <th><a href="?order_by=last_used_date">Last used date</a></th>
+              <th><a href="?order_by=last_used_ip">Last used IP</a></th>
+              <th><a href="?order_by=geoip_city">City</a></th>
+              <th><a href="?order_by=geoip_state">State</a></th>
+              <th><a href="?order_by=geoip_postal_code">Postal Code</a></th>
+              <th><a href="?order_by=geoip_country">Country</a></th>
+            </tr>
+            {% for code in values %}
+            <tr>
+              <td>{{ code.code }}</td>
+              <td>{% if code.last_used_date %}{{ code.last_used_date }}{% else %}-{% endif %}</td>
+              <td>{% if code.last_used_date %}{{ code.last_ip }}{% else %}-{% endif %}</td>
+              <td>{% if code.geoip_city %}{{ code.geoip_city }}{% else %}-{% endif %}</td>
+              <td>{% if code.geoip_state %}{{ code.geoip_state }}{% else %}-{% endif %}</td>
+              <td>{% if code.geoip_postal_code %}{{ code.geoip_postal_code }}{% else %}-{% endif %}</td>
+              <td>{% if code.geoip_country %}{{ code.geoip_country }}{% else %}-{% endif %}</td>
+            </tr>
+            {% endfor %}
+            </table>
+        </div>
+
+        <h4><strong>Plain text list</strong> (click list to copy):</h3>
+
+        <textarea style="width:100%; height:150px;" id="{{ key }}">{% for code in values %}{{ code.code }}
+{% endfor %}</textarea>
+
+        <div id="copy_status{{ forloop.counter0 }}">&nbsp;</div>
+
+        <script type="text/javascript">
+          var textBox{{ forloop.counter0 }} = document.getElementById("{{ key }}");
+          textBox{{ forloop.counter0 }}.onfocus = function() {
+            textBox{{ forloop.counter0 }}.select();
+
+            // Work around Chrome's little problem
+            textBox{{ forloop.counter0 }}.onmouseup = function() {
+              // Prevent further mouseup intervention
+              textBox{{ forloop.counter0 }}.onmouseup = null;
+              return false;
+            };
+
+            // Copy the text
+            copyStatus = document.getElementById("copy_status{{ forloop.counter0 }}");
+            try {
+              var ok = document.execCommand('copy');
+              if (ok) copyStatus.innerHTML = '<div class="w3-text-green">Copied!</div>';
+              else    copyStatus.innerHTML = '<div class="w3-text-red">Unable to copy!</div>';
+            } catch (err) {
+              copyStatus.innerHTML = '<div class="w3-text-red">Unsupported Browser, please use Edit menu > Copy to copy your codes.</div>';
+            }
+            setTimeout("copyStatus.innerHTML = '&nbsp;'", 2000);
+//            setTimeout("copyStatus.fadeOut()", 3000);
+          };
+        </script>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="w3-card w3-light-grey w3-padding w3-hover-shadow" style="width:60%;margin:auto;margin-bottom:23px;">
+    <div class="w3-container, w3-margin">
+      <h4>You don't have any referral codes yet! Use the "Create Codes" button above to get started.</h4>
+    </div>
+  </div>
+{% endif %}
+  <div class="w3-center w3-container" style="margin-top:23px;">
+    <div class="w3-button w3-round-large
+      w3-blue w3-text-sand w3-hover-indigo w3-hover-shadow" style="margin-bottom:20px;">
+      <a style="text-decoration:none;" href="{% url 'skip_logic:campaign_detail' campaign.id %}">
+        <i class="fa fa-undo" aria-hidden="true"></i>&nbsp;&nbsp;Back to Campaign
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

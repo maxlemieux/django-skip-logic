@@ -1,0 +1,22 @@
+{% extends "skip_logic/base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Sign Out{% endblock %}
+
+{% block page %}
+<div class="w3-center w3-container" style="margin-top:46px; margin-bottom:46px;">
+  <h1>Sign Out</h1>
+
+  <p>{% trans 'Are you sure you want to sign out? You won\'t be able to earn reward points while signed out.' %}</p>
+
+  <form method="post" action="{% url 'account_logout' %}">
+    {% csrf_token %}
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+    {% endif %}
+    <button type="submit" class="w3-button w3-border w3-hover-shadow w3-round-large w3-blue w3-hover-indigo w3-margin">{% trans 'Yes, please sign me out.' %}</button>
+  </form>
+</div>
+
+{% endblock %}

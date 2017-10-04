@@ -1,0 +1,152 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<link rel="stylesheet" href="{% static 'css/w3.css' %}">
+<link rel="stylesheet" href="{% static 'css/w3-colors-windows.css' %}">
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<link href="https://fonts.googleapis.com/css?family=Roboto+Slab:thin,regular,bold" rel="stylesheet"> 
+
+{% comment %}
+<script type="text/javascript" src="{% static 'Chart.bundle.js' %}"></script>
+<script type="text/javascript" src="{% static 'Chart.utils.js' %}"></script>
+{% endcomment %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+<style>
+
+a {
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+    background-color: #FDF5E6;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+}
+
+html {
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+}
+
+p {
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+
+textarea {
+    resize: vertical;
+}
+
+.fullheight {
+  height: 100%;
+}
+
+.choiceimg {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+h1, h2, h3, h4 {
+    font-family: 'Roboto Slab', "Sego UI", Arial, sans-serif;
+}
+td {
+    padding:0px 0px 0px 23px;
+}
+th {
+    text-align: center;
+}
+.w3-bold {
+    font-style: bold;
+}
+.w3-thin {
+    font-style: thin;
+}
+.alert {
+    padding: 20px;
+    background-color: #009688;
+    color: white;
+    margin-bottom: 15px;
+}
+.w3-button {
+    font-family: FontAwesome, "Sego UI", Arial, sans-serif;
+}
+.closebtn {
+    margin-left:15px;
+    color:white;
+    font-weight: bold;
+    font-size: 22px;
+    float: right;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.5s;
+}
+.closebtn:hover {
+    color: black;
+}
+.fa-thumbs-o-up {
+    color: green;
+}
+.fa-thumbs-o-up:hover {
+    color: light-grey; 
+}
+
+#parent:hover > div{
+    opacity: 0.6;
+}
+#parent > div:hover {
+    opacity:1;
+}
+
+.breadcrumb {
+    height: 15px;
+}
+.breadcrumbarrow {
+    width: 10px;
+    height: 10px;
+    border: solid;
+    border-width: 0 5px 5px 0;
+    border-color: white;
+    transform:rotate(-45deg);
+    -ms-transform:rotate(-45deg); /* IE 9 */
+    -webkit-transform:rotate(-45deg); /* Opera, Chrome, Safari */
+}
+</style>
+
+<title>{% if SITE_NAME %}{{ SITE_NAME }} - {% endif %}{% block head_title %}{% endblock %}</title>
+
+</head>
+
+<body>
+{% if messages %}
+        {% for message in messages %}
+            <div class="w3-padding w3-border w3-pale-blue {% if message.extra_tags %}{{ message.extra_tags }}{% endif %}">
+                <span class="w3-text-dark-grey closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                {{ message }}
+            </div>
+        {% endfor %}
+{% endif %}
+
+
+
+{% block index %}{% endblock %}
+{% block page %}{% endblock %}
+
+
+</body>
+</html>
+

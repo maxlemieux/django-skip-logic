@@ -1,0 +1,100 @@
+{% extends "skip_logic/base.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block head_title %}{% if "new" in request.path %}Create Page{% else %}Edit Page{% endif %}{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{% url 'skip_logic:survey_index' %}" class="w3-round w3-hover-pale-blue">
+My Surveys</a> >
+{% if "new" in request.path %}
+<a href="{% url 'skip_logic:survey_detail' survey.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-list-alt" aria-hidden="true"></i> <strong>{{ survey.title }}</strong></a> >
+{% else %}
+<a href="{% url 'skip_logic:survey_detail' page.survey.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-file-o" aria-hidden="true"></i> <strong>{{ page.survey.title }}</strong></a> >
+{% endif %}
+{% if "new" in request.path %}Create Page{% else %}Edit Page{% endif %}
+{% endblock %}
+
+{% block page %}
+
+<script>
+$( function() {
+  $( "#id_pub_date" ).datepicker();
+} );
+</script>
+
+  <h1 class="w3-center w3-margin">{% if "new" in request.path %}Create Page{% else %}Edit Page{% endif %}</h1>
+
+  <div class="w3-card w3-padding w3-light-grey w3-margin">
+    <form method="POST" id="form_edit" name="form_edit">
+      {% csrf_token %}
+      <table class="w3-table">
+        <tr>
+          <td style="width:30%;">
+        {{ form.title.errors }}
+        <label for="{{ form.title.id_for_label }}"><strong>Title:</strong></label>
+            <p><small>For internal use. Does not show on survey page.</small></p>
+          </td>
+          <td>
+        {{ form.title }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+        {{ form.page_number.errors }}
+        <label for="{{ form.page_text.id_for_label }}"><strong>Page Number:</strong></label>
+            <p><small>Must be unique within survey; determines default page order.</small></p>
+          </td>
+          <td>
+            {{ form.page_number }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            {{ form.is_last.errors }}
+            <label for="{{ form.slug.id_for_label }}"><strong>URL Slug:</strong></label>
+            <p><small>Must be unique within survey pages; forms part of survey taking URLs.</small></p>
+          </td>
+          <td>
+        {{ form.slug }}&nbsp;<div id="randomize_slug" class="w3-button w3-border w3-hover-shadow w3-round-large w3-margin-left w3-text-dark-grey">Randomize Slug</div></td>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            {{ form.page_text.errors }}
+            <label for="{{ form.page_text.id_for_label }}">Page Text: </label>
+            <p><small>Text entered here will show near the top of the survey page.</small></p>
+          </td>
+          <td>
+            {{ form.page_text }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            {{ form.is_last.errors }}
+            <label for="{{ form.is_last.id_for_label }}">Send to Call to Action?</label>
+          </td>
+          <td>
+            {{ form.is_last }}
+          </td>
+        </tr>
+      </table>
+
+      <div style="text-align:right;">
+        <a href="{% if 'new' in request.path %}{% url 'skip_logic:survey_detail' survey.slug %}{% else %}{% url 'skip_logic:page_detail' page.slug %}{% endif %}" 
+           class="w3-margin w3-button w3-border w3-hover-shadow w3-round-large w3-text-dark-grey">
+          <i class="fa fa-undo" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+        </a>
+        <button type="submit" class="w3-margin w3-button-blue">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+        </button>
+      </div>
+    </form>
+  </div>
+
+{% include "skip_logic/slug_script.html" %}
+
+{% endblock %}

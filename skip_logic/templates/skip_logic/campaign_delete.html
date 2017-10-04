@@ -1,0 +1,44 @@
+{% extends "skip_logic/base.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block head_title %}{% trans "My Campaigns" %}{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{% url 'skip_logic:campaign_index' %}" style="text-decoration:none;">
+My Campaigns</a> > End Campaign
+{% endblock %}
+
+
+{% block page %}
+
+  <h1 class="w3-center">Really end {% trans "Campaign" %} "{{ campaign.name }}"?</h1>
+
+  <div>
+    <div class="w3-container w3-center w3-margin">
+      <p>You are about to end the campaign "{{ campaign.name }}". This is permanent and cannot be reversed.</p>
+      <p>If you continue, referral codes created for this campaign will continue to function, but won't be linked to the campaign anymore.</p>
+    </div>
+  </div>
+
+  <div class="w3-cell-row w3-center">
+    <div class="w3-cell" style="width:20%;">
+      &nbsp;
+    </div>
+    <div class="w3-cell" style="width:30%;">
+      <form action="{% url 'skip_logic:campaign_detail' campaign.id %}" method="get">
+        <input class="w3-button-blue w3-margin" type="submit" value="&#xf0e2;&nbsp;&nbsp;Oops, take me back!" />
+      </form>
+    </div>
+    <div class="w3-cell" style="width:30%;">
+      <form action="#" method="post">
+        {% csrf_token %}
+        <input class="w3-button w3-text-dark-grey w3-light-grey w3-round-large w3-border w3-hover-dark-grey w3-hover-text-sand w3-hover-shadow" type="submit" value="&#xf1f8;&nbsp;&nbsp;Delete this campaign forever" />
+      </form>
+    </div>
+    <div class="w3-cell" style="width:20%;">
+      &nbsp;
+    </div>
+  </div>
+{% endblock %}

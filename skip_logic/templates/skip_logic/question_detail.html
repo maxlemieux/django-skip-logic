@@ -1,0 +1,89 @@
+{% extends "skip_logic/base.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block head_title %}Question Details{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{% url 'skip_logic:survey_index' %}" style="text-decoration:none;" class="w3-round w3-hover-pale-blue">
+My Surveys</a> > 
+<a href="{% url 'skip_logic:survey_detail' question.page.survey.slug %}" style="text-decoration:none;" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-list-alt" aria-hidden="true"></i> <strong>{{ question.page.survey.title|truncatechars:30 }}</strong></a> > 
+<a href="{% url 'skip_logic:page_detail' question.page.slug %}" style="text-decoration:none;" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-file-o" aria-hidden="true"></i> <strong>{{ question.page.title|truncatechars:30 }}</strong></a> > 
+<i class="fa fa-question-circle-o" aria-hidden="true"></i> <strong>{{ question.question_text|truncatechars:30 }}</strong>
+{% endblock %}
+
+{% block page %}
+  <h1 class="w3-center">Question: {{ question.question_text }}</h1>
+
+  <div class="w3-card w3-padding w3-light-grey">
+    <h3><i class="fa fa-question-circle-o" aria-hidden="true"></i>&nbsp;&nbsp;Question Details</h3>
+    <p><strong>Question Number:</strong> {{ question.question_number }}</p>
+    <p><strong>Question Text:</strong> {{ question.question_text }}</p>
+    <p><strong>URL Slug:</strong> {{ question.slug }}</p>
+    <p><strong>Horizontal Layout:</strong> {% if question.layout_horizontal %}Yes{% else %}No{% endif %}</p>
+    <p><strong>Required:</strong> {% if question.required %}Yes{% else %}No{% endif %}</p>
+
+    <div class="w3-cell-row w3-margin w3-center">
+      <div class="w3-cell">
+        <a class="w3-button-blue"
+           href="{% url 'skip_logic:question_edit' question_slug=question.slug %}">
+           <i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit Question Details
+        </a>
+      </div>
+      <div class="w3-cell">
+        <a class="w3-button w3-border w3-hover-shadow w3-round-large w3-text-dark-grey"
+           href="{% url 'skip_logic:question_delete' question_slug=question.slug %}">
+           <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;&nbsp;Remove Question
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="w3-card w3-padding w3-light-grey w3-margin-top w3-margin-bottom">
+    <h2><i class="fa fa-dot-circle-o" aria-hidden="true"></i>&nbsp;&nbsp;Choices</h2>
+    {% if question.choice_question.all|length is 0 %}
+    <p>This question doesn't have any choices yet!</p>
+    <p>Click the "Add New Choice..." button to add a choice to this question.</p>
+    {% endif %}
+
+    <div class="w3-container w3-center w3-margin-bottom w3-margin-top">
+      <a class="w3-button-blue w3-large" 
+         href="{% url 'skip_logic:choice_new' question_slug=question.slug %}">
+         <i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add New Choice...
+      </a>
+    </div>
+
+    <table class="w3-table-all">
+    {% if question.choice_question.all|length > 0 %}
+      <tr><th>Number</th><th>Text</th><th>URL Slug</th><th>&nbsp;</th></tr>
+    {% endif %}
+    {% for choice in question.choice_question.all %}
+      <tr>
+        <td>{{ choice.choice_number }}</td>
+        <td>{{ choice.choice_text }}</td>
+        <td>{{ choice.slug }}</td>
+        <td class="w3-right">
+          <a class="w3-button-blue"
+             href="{% url 'skip_logic:choice_detail' choice_slug=choice.slug %}">
+             <i class="fa fa-edit" aria-hidden="true"></i>&nbsp;&nbsp;Choice Details
+          </a>
+        </td>
+      </tr>
+    {% endfor %}
+    </table>
+
+  </div>
+
+  <div class="w3-center w3-margin">
+    <a class="w3-button w3-hover-shadow w3-round-large w3-text-dark-grey w3-border"
+       href="{% url 'skip_logic:page_detail' page_slug=question.page.slug %}">
+      <i class="fa fa-undo" aria-hidden="true"></i>&nbsp;&nbsp;Back to Page
+    </a>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,226 @@
+{% extends "skip_logic/base.html" %}
+
+<a name="top"></a>
+
+{% block head_title %}Analytics - {{ survey.title }}{% endblock %}
+
+{% block breadcrumbs %}<a href="{% url 'skip_logic:results_index' %}">Analytics</a> > Results for survey {{ survey.title }}{% endblock %}
+
+{% block page %}
+  <h1 class="w3-center">Results for survey "{{ survey.title }}"</h1>
+
+  {% for key, value in answer_dict.items %}
+  <a name="q_{{ key.slug }}"></a>
+  <div class="w3-container w3-padding w3-margin">
+    <h3>Question {{ forloop.counter }}/{{ answer_dict.items|length }}: {{ key }}</h3>
+    <ul> 
+
+      {% for choice in value %}
+      <li>{{ choice.0 }} ({{ choice.1 }} {% if choice.2.0.0.1 %}responses{% else %}votes{% endif %})
+  
+        {% if choice.2.0.0.1 %}    
+        (Scroll down to view more responses:)
+        <div class="w3-light-grey w3-padding w3-border w3-margin" style="overflow: auto; width: 90%; height: 300px;">
+          {% for feedback in choice.2 %}
+          <div class="w3-container w3-white w3-padding w3-card-4" style="width:90%;margin:auto;margin-top:10px;margin-bottom:10px;">
+            <p class="w3-large" style="width:90%;margin:auto;margin-top:10px;margin-bottom:10px;">"{{ feedback.0 }}"</p>
+            <div class="w3-right" style="margin-bottom:10px;margin-right:10px;">
+              Posted on {{ feedback.1 }} by {% if feedback.3 %}<strong>{{ feedback.3 }}</strong>{% else %}anonymous{% endif %}
+              <div class="w3-small">
+                (Session: {{ feedback.2 }})
+              </div>
+              <div class="w3-small">
+                (IP: {{ feedback.4 }})
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+          <div><h4 class="w3-center">That's all for now!</h4></div>
+        </div>
+        {% endif %}
+      </li>
+    {% endfor %}
+    </ul>
+
+  {% if value|length > 1 %}
+  <div class="w3-container">
+    <div class="w3-container" style="width:100%;margin:auto;">
+      <div class="w3-card w3-margin w3-padding" id="container{{ forloop.counter }}">
+        <canvas id="canvas{{ forloop.counter }}" style="height:100px;"></canvas>
+      </div>
+      <div class="w3-center"><strong>Responses for Question {{ forloop.counter }}: {{ key }}</strong></div>
+    </div>
+  </div>
+  {% endif %}
+
+    <a href="#top">Back to top</a>
+
+  </div>
+  {% endfor %}
+
+
+  <div class="w3-container w3-center">
+    <div class="w3-margin w3-button w3-round w3-hover-shadow w3-text-dark-grey w3-border">
+      <a style="text-decoration:none;" href="{% url 'skip_logic:results_index' %}"><i class="fa fa-undo" aria-hidden="true"></i>&nbsp;&nbsp;Back</a>
+    </div>
+  </div>
+
+
+
+  <script type="text/javascript">
+    window.onload = function() {
+      Chart.scaleService.updateScaleDefaults('linear', {
+        ticks: {
+          min: 0
+        }
+      });
+
+      var colorList = [window.chartColors.red, window.chartColors.blue, window.chartColors.yellow, window.chartColors.purple, window.chartColors.orange, window.chartColors.green, window.chartColors.grey, window.chartColors.red, window.chartColors.blue, window.chartColors.yellow, window.chartColors.purple, window.chartColors.orange, window.chartColors.green,];
+
+  {% for key, value in answer_dict.items %}
+    {% if value|length > 1 %}
+
+      var color = Chart.helpers.color;
+      var barChartData{{ forloop.counter }} = {
+        labels: ["Responses"],
+        datasets: [
+          {% for choice in value %}
+          {
+            label: "{{ choice.0 }} ",
+            backgroundColor: color(colorList[{{ forloop.counter0 }}]).alpha(0.5).rgbString(),
+            borderColor: colorList[{{ forloop.counter0 }}],
+            borderWidth: 1,
+            data: [
+              {{ choice.1 }},
+            ]
+          },
+          {% endfor %}
+        ]
+      };
+
+      var ctx{{ forloop.counter }} = document.getElementById("canvas{{ forloop.counter }}").getContext("2d");
+      window.myBar{{ forloop.counter }} = new Chart(ctx{{ forloop.counter }}, {
+        type: 'bar',
+        data: barChartData{{ forloop.counter }},
+        options: {
+          scales: {
+            yAxes: [{
+              // https://stackoverflow.com/questions/15751571/how-to-change-the-y-axis-values-from-real-numbers-to-integer-in-chartjs
+              ticks: {
+                beginAtZero: true,
+                callback: function(value) {if (value % 1 === 0) {return value;}}
+              }
+            }]
+          },
+          responsive: true,
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: "{{ key }}"
+          },
+        }
+      });
+
+  {% endif %}
+{% endfor %}
+
+    };
+
+    var colorNames = Object.keys(window.chartColors);
+  </script>
+
+
+{% comment %}
+This code is nearly direct from Mike Bostock's sankey.js example at https://bost.ocks.org/mike/sankey/
+
+Result code sets would provide an interesting input layer... and needs to show the (call to) action after survey as output layer.
+{% endcomment %}
+
+{% comment %}
+{% if answer_dict.items|length > 1 %}
+<script src="//d3js.org/d3.v2.min.js" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}sankey.js"></script>
+<script>
+
+var margin = {top: 1, right: 1, bottom: 6, left: 1},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var formatNumber = d3.format(",.0f"),
+    format = function(d) { return formatNumber(d) + " TWh"; },
+    color = d3.scale.category20();
+
+var svg = d3.select("#chart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var sankey = d3.sankey()
+    .nodeWidth(15)
+    .nodePadding(10)
+    .size([width, height]);
+
+var path = sankey.link();
+
+d3.json("https://djangoskiplogic.com/survey/sankey/{{ survey_slug }}.json", function(energy) {
+
+  sankey
+      .nodes(energy.nodes)
+      .links(energy.links)
+      .layout(32);
+
+  var link = svg.append("g").selectAll(".link")
+      .data(energy.links)
+    .enter().append("path")
+      .attr("class", "link")
+      .attr("d", path)
+      .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+      .sort(function(a, b) { return b.dy - a.dy; });
+
+  link.append("title")
+      .text(function(d) { return d.source.name + " → " + d.target.name + "\n" + format(d.value); });
+
+  var node = svg.append("g").selectAll(".node")
+      .data(energy.nodes)
+    .enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+    .call(d3.behavior.drag()
+      .origin(function(d) { return d; })
+      .on("dragstart", function() { this.parentNode.appendChild(this); })
+      .on("drag", dragmove));
+
+  node.append("rect")
+      .attr("height", function(d) { return d.dy; })
+      .attr("width", sankey.nodeWidth())
+      .style("fill", function(d) { return d.color = color(d.name.replace(/ .*/, "")); })
+      .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
+    .append("title")
+      .text(function(d) { return d.name + "\n" + format(d.value); });
+
+  node.append("text")
+      .attr("x", -6)
+      .attr("y", function(d) { return d.dy / 2; })
+      .attr("dy", ".35em")
+      .attr("text-anchor", "end")
+      .attr("transform", null)
+      .text(function(d) { return d.name; })
+    .filter(function(d) { return d.x < width / 2; })
+      .attr("x", 6 + sankey.nodeWidth())
+      .attr("text-anchor", "start");
+
+  function dragmove(d) {
+    d3.select(this).attr("transform", "translate(" + d.x + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
+    sankey.relayout();
+    link.attr("d", path);
+  }
+});
+
+</script>
+{% endif %}
+{% endcomment %}
+
+{% endblock %}

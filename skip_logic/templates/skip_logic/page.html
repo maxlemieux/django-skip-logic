@@ -1,0 +1,100 @@
+{% extends "skip_logic/base_survey.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{{ survey.title }}{% endblock %}
+
+{% block breadcrumbs %} Surveys > {{ survey.title }}{% endblock %}
+
+{% block page %}
+
+  {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+  <div>
+  {% if page_question_list %}
+
+    {% if page.page_text %}
+    <div class="w3-container w3-center">
+      <h4 class="w3-center">{{ page.page_text }}</h4>
+    </div>
+    {% endif %}
+
+    <div class="w3-container" style="margin:auto; margin-bottom:92px;width:80%;">
+      <form action="{% url 'skip_logic:vote' page.slug %}" method="post">
+      {% csrf_token %}
+      {% for question in page_question_list %}
+        <h3>{{ question.question_text }}</h3>
+      {% if question.layout_horizontal == True %}
+        <div class="w3-container w3-cell-row">
+      {% endif %}
+      {% for choice in question.choice_question.all %}
+        {% if question.layout_horizontal == True %}
+          <div class="w3-cell" style="width:10px;">&nbsp;</div>
+          <div id="panel{{ forloop.counter }}" class="w3-cell w3-padding w3-light-grey w3-mobile w3-card w3-margin">
+            <div>
+        {% else %}
+          <div id="panel{{ forloop.counter }}" class="w3-card w3-padding w3-light-grey w3-mobile">
+            <div style="margin:auto; margin-bottom:10px; width:80%">
+        {% endif %}
+            {% if choice.choice_image %}
+              <div class="choiceimg" style="background-image: url('{{ choice.choice_image.url }}'); margin-top:20px;margin-bottom:10px; background-size: 100%;">
+              </div>
+            {% endif %}
+              <input class="w3-radio" type="radio"
+                     name="choice{{ forloop.parentloop.counter }}"
+                     id="choice{{ forloop.counter }}"
+                     value="{{ choice.id }}"
+                     required
+                     {% if question.choice_question.all|length is 1 %}checked="checked"
+                     style="display:none;"{% endif %}/>
+
+              <label for="choice{{ forloop.counter }}">{% if choice.choice_text %}{{ choice.choice_text }}{% endif %}</label>
+
+            {% if choice.input_field %}
+              <input onclick='btn = document.getElementById("choice{{ forloop.counter }}"); btn.checked = true;'
+                class="w3-input"
+                type="text"
+                name="inputfield{{ forloop.counter }}" 
+                id="choicetextinput{{ forloop.counter }}"
+                />
+            {% endif %}
+        {% if question.layout_horizontal == True %}
+            </div> <!-- choice details -->
+          </div> <!-- choice loop -->
+          <div class="w3-cell" style="width:10px;">&nbsp;</div>
+        {% else %}
+            </div> <!-- choice details -->
+          </div> <!-- choice loop -->
+        {% endif %}
+      {% endfor %}
+    {% if question.layout_horizontal == True %}
+      </div> <!-- cell-row -->
+    {% endif %}
+  {% endfor %}
+      <div class="w3-container" style="width:100%;">
+      {% if page.is_last == True %}
+        <div class="w3-margin w3-center"><input type="submit" value="Finish" class="w3-button-blue w3-margin" /></div>
+      {% else %}
+        <div class="w3-margin w3-center"><input type="submit" value="Next" class="w3-button-blue" /></div>
+      {% endif %}
+      </div>
+    </form>
+
+  </div>
+
+{% else %}
+    <p>{{ page.page_text }}</p>
+    <form action="{% url 'skip_logic:vote' page.id %}" method="post">
+    {% csrf_token %}
+      <div class="w3-container" style="width:100%;">
+      {% if page.is_last == True %}
+        <div class="w3-margin w3-center"><input type="submit" value="Finish" class="w3-button-blue w3-margin" /></div>
+      {% else %}
+        <div class="w3-margin w3-center"><input type="submit" value="Next" class="w3-button-blue" /></div>
+      {% endif %}
+      </div>
+    </form>
+  {% endif %}
+  </div>
+
+{% endblock %}

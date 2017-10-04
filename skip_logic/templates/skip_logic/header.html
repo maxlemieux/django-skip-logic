@@ -1,0 +1,66 @@
+    <div class="w3-bar w3-amber">
+      <a href="{% url 'skip_logic:home_index' %}" 
+         onclick="showOverlay()"
+         class="w3-bar-item w3-button w3-round w3-text-dark-grey w3-hover-blue">
+<strong>django-skip-logic demo</strong>
+      </a>
+      <a href="{% url 'skip_logic:home_index' %}" 
+         onclick="showOverlay()"
+         class="w3-bar-item w3-button w3-round w3-margin-left w3-text-dark-grey w3-hover-blue">
+Home
+      </a>
+      <a href="{% url 'skip_logic:survey_index' %}" 
+         onclick="showOverlay()"
+         class="w3-bar-item w3-button w3-round w3-text-dark-grey w3-hover-blue">
+Surveys
+      </a>
+      <a href="{% url 'skip_logic:rewards' %}"
+         onclick="showOverlay()"
+         class="w3-bar-item w3-button w3-round w3-hover-blue w3-text-dark-grey">
+Rewards
+      </a>
+  {% if request.user.is_authenticated %}
+    <a href="{% url 'account_logout' %}" 
+       class="w3-bar-item w3-button w3-right w3-margin-right w3-text-dark-grey w3-round w3-hover-blue">
+Log Out
+    </a>
+    {% if perms.skip_logic.add_survey %}
+      <a href="{% url 'skip_logic:results_index' %}" 
+         onclick="showOverlay()"
+         class="w3-bar-item w3-button w3-text-dark-grey w3-round w3-hover-blue" 
+         id="analytics">
+Analytics
+      </a>
+      <a href="{% url 'skip_logic:campaign_index' %}" 
+         onclick="showOverlay()"
+         class="w3-bar-item w3-button w3-text-dark-grey w3-round w3-hover-blue" 
+         id="campaigns">
+Campaigns
+      </a>
+
+      {% if request.user.is_superuser %}
+        <a href="{% url 'profile' %}" class="w3-bar-item w3-button w3-right w3-text-dark-grey w3-hover-blue w3-round">
+Admin
+        </a>
+      {% endif %}
+    {% endif %}
+    <a href="{% url 'profile' %}" 
+       class="w3-bar-item w3-button  w3-right w3-text-dark-grey w3-round w3-hover-blue w3-round">
+Settings
+    </a>
+    <a href="{% url 'skip_logic:rewards' %}" 
+       class="w3-bar-item w3-button  w3-right w3-hover-blue w3-round" id="currency_counter">
+Reward Points: {{ user.userprofile.user_currency }}
+    </a>
+  {% else %}
+    <a href="{% url 'account_login' %}" 
+       class="w3-bar-item w3-button  w3-right w3-round w3-margin-right w3-text-dark-grey w3-hover-blue">
+<strong>Log In</strong>
+    </a>
+    <a href="{% url 'account_signup' %}" 
+       class="w3-bar-item w3-button  w3-right  w3-round w3-margin-right w3-hover-blue">
+Sign Up
+    </a>
+  {% endif %}
+</div> 
+

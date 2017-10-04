@@ -1,0 +1,96 @@
+{% extends "skip_logic/base.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block head_title %}{% if 'new' in request.path %}Create New Survey{% else %}Edit Survey Details{% endif %}{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{% url 'skip_logic:survey_index' %}" class="w3-round w3-hover-pale-blue">
+My Surveys</a> >
+{% if 'new' in request.path %}
+Create New Survey
+{% else %}
+<a href="{% url 'skip_logic:survey_detail' survey.slug %}" class="w3-round w3-hover-pale-blue"><i class="fa fa-list-alt" aria-hidden="true"></i> 
+<strong>{{ survey.title }}</strong></a> >
+Edit Details
+{% endif %}
+{% endblock %}
+
+{% block page %}
+
+{% comment %}
+https://jqueryui.com/datepicker/
+{% endcomment %}
+<script>
+$( function() {
+  $( "#id_pub_date" ).datepicker();
+} );
+</script>
+
+  <h1 class="w3-center">{% if 'new' in request.path %}Create New Survey{% else %}Edit Survey Details{% endif %}</h1>
+
+  <div class="w3-card w3-light-grey w3-padding w3-margin">
+    <h3>Survey Details</h3>
+    <form method="POST" id="form_edit" name="form_edit">
+      {% csrf_token %}
+
+      <table class="w3-table">
+        <tr>
+          <td style="width:30%;"><label for="id_title"><strong>Title:</strong></label></td>
+          <td>{{ form.title }}</td>
+        </tr>
+        <tr>
+          <td><label for="id_title"><strong>Description:</strong></label></td>
+          <td>{{ form.description }}</td>
+        </tr>
+        <tr>
+          <td><label for="id_title"><strong>URL Slug:</strong></label></td>
+          <td>{{ form.slug }}&nbsp;<div id="randomize_slug" class="w3-button w3-border w3-hover-shadow w3-round-large w3-margin-left">Randomize Slug</div></td>
+        </tr>
+        <tr>
+          <td><label for="id_title">Date published:</label></td>
+          <td>{{ form.pub_date }}</td>
+        </tr>
+        <tr>
+          <td><label for="id_title">Call to Action Link Text:</label></td>
+          <td>{{ form.call_to_action_label }}</td>
+        </tr>
+        <tr>
+          <td><label for="id_title">Call to Action URL:</label></td>
+          <td>{{ form.call_to_action_url }}</td>
+        </tr>
+        <tr>
+          <td><label for="id_title">Call to Action Text:</label></td>
+          <td>{{ form.call_to_action_text }}</td>
+        </tr>
+        </tr>
+      </table>
+      <div style="text-align: right;">
+        <div class="w3-margin">
+          <a href="{% if "new" in request.path %}{% url 'skip_logic:survey_index' %}{% else %}{% url 'skip_logic:survey_detail' survey.slug %}{% endif %}"
+             class="w3-margin w3-button w3-border w3-hover-shadow w3-round-large w3-text-dark-grey"><i class="fa fa-undo" aria-hidden="true"></i>&nbsp;&nbsp;Cancel</a>
+          <button type="submit" class="w3-margin w3-button-blue">
+            <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+{% if "new" in request.path %}
+{% else %}
+  <div>
+    <a class="w3-right w3-button w3-hover-shadow w3-round-large w3-border w3-margin"
+       href="{% url 'skip_logic:survey_delete' survey.slug %}">
+      <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;&nbsp;Remove survey
+    </a>
+  </div>
+{% endif %}
+
+
+
+{% include "skip_logic/slug_script.html" %}
+
+{% endblock %}

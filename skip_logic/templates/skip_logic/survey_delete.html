@@ -1,0 +1,65 @@
+{% extends "skip_logic/base.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block head_title %}Confirm Survey Removal{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{% url 'skip_logic:survey_index' %}" class="w3-round w3-hover-pale-blue w3-text-pale-blue">
+My Surveys</a> > 
+<a href="{% url 'skip_logic:survey_detail' survey.slug %}" class="w3-round w3-hover-pale-blue w3-text-pale-blue">
+<i class="fa fa-list-alt" aria-hidden="true"></i> <strong>{{ survey.title }}</strong></a> > 
+<span class="w3-text-pale-blue">Confirm Survey Removal</span>
+{% endblock %}
+
+
+{% block page %}
+
+  <h1 class="w3-center">Really remove survey "{{ survey.title }}"?</h1>
+
+  <div class="w3-center w3-margin-bottom" style="width:80%; margin:auto;">
+  <p>This survey will be permanently removed.</p>
+  <p>If you continue, pages, questions, choices and paths created for this survey will also be removed:</p>
+</div>
+  <div class="w3-card w3-padding w3-light-grey w3-text-dark-grey" style="width:80%; margin:auto; margin-bottom:20px;">
+    <h3><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;&nbsp;Survey: {{ survey.title }}</h3>
+  {% for this_page in survey.page_survey.all %}
+    <h4>&nbsp;&nbsp;<i class="fa fa-file-o" aria-hidden="true"></i>&nbsp;&nbsp;Page: {{ this_page.title }}</h4>
+    <ul style="list-style-type:none;">
+    {% for this_question in this_page.question_page.all %}
+      <li>
+        <h5>&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-question-circle-o" aria-hidden="true"></i>&nbsp;&nbsp;Question: {{ this_question.question_text }}</h5>
+        <ul style="list-style-type:none;">
+        {% for this_choice in this_question.choice_question.all %}
+          <li><h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-dot-circle-o" aria-hidden="true"></i>&nbsp;&nbsp;Choice: {{ this_choice.choice_text }}</h6></li>
+            <ul style="list-style-type:none;">
+              {% for this_path in this_choice.path_choice.all %}
+                <li>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Path: {{ this_path }}
+                </li>
+              {% endfor %}
+            </ul>
+        {% endfor %}
+        </ul>
+      </li>
+      {% endfor %}
+    </ul>
+  {% endfor %}
+  </div>
+
+  <div class="w3-cell-row w3-center" style="margin-bottom:92px;">
+    <div class="w3-cell">
+      <form action="{% url 'skip_logic:survey_detail' survey.slug %}" method="get">
+        <input class="w3-button-blue" type="submit" value="&#xf0e2;&nbsp;&nbsp;Oops, take me back!" />
+      </form>
+    </div>
+    <div class="w3-cell">
+      <form action="#" method="post">
+        {% csrf_token %}
+        <input class="w3-button w3-round-large w3-border w3-light-grey w3-text-dark-grey w3-hover-dark-grey w3-hover-shadow" type="submit" value="&#xf1f8;&nbsp;&nbsp;Delete this survey forever" />
+      </form>
+    </div>
+  </div>
+
+{% endblock %}

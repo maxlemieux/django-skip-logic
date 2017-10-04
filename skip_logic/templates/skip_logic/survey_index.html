@@ -1,0 +1,90 @@
+{% extends "skip_logic/base.html" %}
+
+{% block head_title %}My Surveys{% endblock %}
+
+{% block breadcrumbs %}My Surveys > Available Surveys{% endblock %}
+
+{% block index %}
+
+{% if latest_survey_list %}
+{% comment %}
+     style="background-size:cover; background-image: url('../static/GettyImages-90539573-58e3eea25f9b58ef7e12535b.jpg');">
+{% endcomment %}
+<h1 class="w3-center">Surveys</h1>
+
+  <div class="w3-card w3-light-grey w3-padding w3-margin-bottom" style="width: 100%;">
+    <h3>My available&nbsp;surveys:</h3>
+
+    {% if latest_survey_list|length is 0 %}
+      {% if perms.skip_logic.add_survey %}
+        <p>You don't have any surveys yet!</p>
+        <p>Click the button "Add new survey..." below to get started.</p>
+      {% else %}
+        <p>You don't have any surveys available yet. Sign up today to begin earning rewards!</p>
+      {% endif %}
+    {% endif %}
+
+    {% if perms.skip_logic.add_survey %}
+    <div class="w3-center w3-margin">
+      <div class="w3-button-blue w3-large">
+        <a href="{% url 'skip_logic:survey_new' %}">
+          <i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add new survey...
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+    {% for survey in latest_survey_list %}
+    {% with survey_slug=survey.slug %}
+    <div class="w3-cell-row w3-padding w3-border w3-margin-bottom">
+      <div class="w3-container w3-cell w3-cell-middle" style="width:30%;">
+        <strong>{{ survey.title|truncatechars:"50" }}</strong>
+      </div>
+      <div class="w3-container w3-cell w3-cell-middle" style="text-align:right;">
+        {% if survey.page_survey.all|length > 0 %}
+        <div class="w3-button w3-hover-shadow w3-pale-green w3-hover-green w3-round-large w3-margin-left w3-border w3-text-dark-grey">
+          <a style="text-decoration:none;" href="{% url 'skip_logic:page' survey.slug survey.page_survey.all.0.slug %}">
+            <i class="fa fa-play" aria-hidden="true"></i>&nbsp;&nbsp;Start
+          </a>
+        </div>
+        {% else %}
+        {% endif %}
+        {% if survey.author == request.user %}
+        <div class="w3-button-blue w3-margin-left">
+          <a style="text-decoration:none;" href="{% url 'skip_logic:survey_detail' survey_slug %}">
+          {% if survey.page_survey.all|length > 0 %}
+            <i class="fa fa-list-alt" aria-hidden="true"></i>&nbsp;&nbsp;Details
+          {% else %}
+            <i class="fa fa-cog" aria-hidden="true"></i>&nbsp;&nbsp;Set Up...
+          {% endif %}
+          </a>
+        </div>
+        <div class="w3-button w3-hover-shadow w3-round-large w3-margin-left w3-text-dark-grey w3-border">
+          <a style="text-decoration:none;" href="{% url 'skip_logic:survey_results' survey.slug %}">
+            <i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;&nbsp;Analytics
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endwith %}
+    {% endfor %}
+  </div>
+{% else %} 
+    {% if perms.skip_logic.add_survey %}
+  <div class="w3-card w3-light-grey w3-padding" style="width:80%;margin:auto;margin-top:46px;">
+      <h3>My available surveys:</h3>
+      <p>You don't have any surveys yet!</p>
+      <p>Click the button "Add new survey..." below to get started.</p>
+      <div class="w3-center w3-margin">
+        <div class="w3-button w3-text-pale-blue w3-blue w3-hover-shadow w3-hover-indigo w3-round-large w3-border w3-margin-left w3-margin-right">
+          <a style="text-decoration:none;" href="{% url 'skip_logic:survey_new' %}">
+            <i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add new survey...
+          </a>
+        </div>
+      </div>
+  </div>
+    {% endif %}
+
+{% endif %} 
+{% endblock %}

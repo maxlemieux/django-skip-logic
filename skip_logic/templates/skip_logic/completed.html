@@ -1,0 +1,38 @@
+{% extends "skip_logic/base_survey.html" %}
+
+{% block head_title %}Surveys > {{ completed_survey.title }} > Complete{% endblock %}
+{% block breadcrumbs %}Surveys > {{ completed_survey.title }} > Complete{% endblock %}
+{% block page %}
+    <div class="w3-container" style="margin-top:46px;">
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        <header>
+          <h1 class="w3-center">{{ completed_survey.title }} Completed!</h1>
+        </header>
+    </div>
+    <div class="w3-container" style="margin:auto; width:60%; margin-top:46px;margin-bottom:138px;">
+      {% if completed_survey.call_to_action_text %}
+        {{ completed_survey.call_to_action_text }}
+      {% else %}
+        Thanks for participating!
+      {% endif %}
+
+      <div class="w3-container w3-cell-row" style="margin-top:46px;">
+        <div class="w3-cell" style="width:33%;"></div>
+        <div class="w3-cell" style="width:33%;">
+          {% if completed_survey.call_to_action_url %}
+            <a href="{{ completed_survey.call_to_action_url }}">
+              <div class="w3-button w3-green w3-round-large w3-xlarge w3-hover-light-green w3-hover-text-dark-grey w3-hover-shadow">
+                {% if completed_survey.call_to_action_label %}
+                  {{ completed_survey.call_to_action_label }}
+                {% else %}
+                  Get Started
+                {% endif %}
+              </div>
+            </a>
+          {% endif %}
+        </div>
+        <div class="w3-cell" style="width:33%;"></div>
+      </div>
+
+    </div>
+{% endblock %}

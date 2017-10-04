@@ -1,0 +1,26 @@
+{% extends "skip_logic/base.html" %}
+
+{% block head_title %}Home{% endblock %}
+
+{% block breadcrumbs %}Home > Getting Started{% endblock %}
+
+{% block index %}
+
+  <div class="w3-row">
+    <div class="w3-col s6">
+      <div class="w3-card w3-round-large w3-margin w3-padding">
+        <h2>Earn Rewards</h2>
+<p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed varius ligula ac volutpat efficitur. Fusce vel vestibulum ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec mollis, turpis a sodales condimentum, nulla dui aliquam tortor, porta dapibus massa mi accumsan velit. Vivamus quis lectus auctor, semper orci ac, luctus ante. Donec ut erat et dui auctor rutrum nec vel magna. Nullam sapien dolor, placerat ut sapien non, laoreet placerat ligula.       </p>
+        </div>
+    </div>
+    <div class="w3-col s6">
+      <div class="w3-card w3-round-large w3-margin w3-padding">
+        <h2>Create Surveys</h2>
+<p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed varius ligula ac volutpat efficitur. Fusce vel vestibulum ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec mollis, turpis a sodales condimentum, nulla dui aliquam tortor, porta dapibus massa mi accumsan velit. Vivamus quis lectus auctor, semper orci ac, luctus ante. Donec ut erat et dui auctor rutrum nec vel magna. Nullam sapien dolor, placerat ut sapien non, laoreet placerat ligula.       </p>
+        <img src="" >
+        <div class="w3-button-blue"><a href="{% url 'skip_logic:survey_index' %}">Start Creating</a></div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

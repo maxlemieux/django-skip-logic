@@ -1,0 +1,49 @@
+{% extends "skip_logic/base.html" %}
+
+{% block head_title %}Rewards{% endblock %}
+
+{% block breadcrumbs %}Rewards{% endblock %}
+
+{% block page %}
+    <div class="w3-container w3-margin">
+
+      <h1 class="w3-center">Rewards</h1>
+
+      <div class="w3-container w3-display-container w3-padding w3-pale-blue w3-round-large" style="margin: auto; width: 80%;">
+        <h2 class="w3-center ">Platinum Level Rewards</h2>
+        <div class="w3-cell-row">
+          {% for reward in platinum_reward_list %}
+          <div class="w3-cell w3-light-grey w3-center w3-margin w3-padding w3-round-large w3-border w3-hover-shadow" style="height: 250px; width: 250px;">
+            {{ reward.name }}<br />
+            <img src="{{ MEDIA_URL }}/{{ reward.image }}" style="width:150px;height:150px;"><br/>
+            {{ reward.point_cost }}<br />
+          </div>
+          {% endfor %}
+        </div>
+
+        <h2 class="w3-center ">Gold Level Rewards</h2>
+        <div class="w3-cell-row">
+          {% for reward in gold_reward_list %}
+          <div class="w3-cell w3-amber w3-center w3-margin w3-padding w3-round-large w3-border w3-hover-shadow" style="height: 250px; width: 250px;">
+            {{ reward.name }}<br />
+            <img src="{{ MEDIA_URL }}/{{ reward.image }}" style="width:150px;height:150px;"><br/>
+            {{ reward.point_cost }}<br />
+          </div>
+          {% endfor %}
+        </div>
+
+        <h2 class="w3-center ">Silver Level Rewards</h2>
+        <div class="w3-cell-row">
+          {% for reward in silver_reward_list %}
+          <div class="w3-cell w3-grey w3-center w3-margin w3-padding w3-round-large w3-border w3-hover-shadow" style="height: 250px; width: 250px;">
+            {{ reward.name }}<br />
+            <img src="{{ MEDIA_URL }}/{{ reward.image }}" style="width:150px;height:150px;"><br/>
+            {{ reward.point_cost }}<br />
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+
+{% endblock %}

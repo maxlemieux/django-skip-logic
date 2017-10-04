@@ -1,0 +1,58 @@
+{% extends "skip_logic/base.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block head_title %}Confirm Choice Removal{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{% url 'skip_logic:survey_index' %}" class="w3-round w3-hover-light-blue">
+My Surveys</a> > 
+<a href="{% url 'skip_logic:survey_detail' choice.question.page.survey.slug %}" class="w3-round w3-hover-light-blue">
+<i class="fa fa-list-alt" aria-hidden="true"></i> <strong>{{ choice.question.page.survey.title|truncatechars:30 }}</strong></a> > 
+<a href="{% url 'skip_logic:page_detail' choice.question.page.slug %}" class="w3-round w3-hover-light-blue">
+<i class="fa fa-file-o" aria-hidden="true"></i> <strong>{{ choice.question.page.title|truncatechars:30 }}</strong></a> > 
+<a href="{% url 'skip_logic:question_detail' choice.question.slug %}" class="w3-round w3-hover-light-blue">
+<i class="fa fa-question-circle-o" aria-hidden="true"></i> <strong>{{ choice.question.question_text|truncatechars:30 }}</strong></a> >
+<a href="{% url 'skip_logic:choice_detail' choice.slug %}" class="w3-round w3-hover-light-blue">
+<i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>{{ choice.choice_text|truncatechars:30 }}</strong></a> > 
+Confirm Choice Removal
+{% endblock %}
+
+
+{% block page %}
+
+  <h1 class="w3-center">Really remove choice "{{ choice.choice_text }}"?</h1>
+
+  <div>
+    <div class="w3-container w3-center w3-margin">
+      <p>This choice will be removed from the question, along with its path if present:</p>
+    </div>
+  </div>
+
+  <div class="w3-card w3-padding w3-light-grey w3-text-dark-grey" style="width: 80%;margin:auto;margin-bottom:23px;">
+              <i class="fa fa-dot-circle-o" aria-hidden="true"></i>&nbsp;&nbsp;Choice: {{ choice.choice_text }}
+              <ul style="list-style-type:none;">
+                {% for this_path in choice.path_choice.all %}
+                  <li>
+                    <i class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Path: {{ this_path }}
+                  </li>
+                {% endfor %}
+              </ul>
+  </div>
+
+
+  <div class="w3-container w3-cell-row w3-center">
+    <div class="w3-cell">
+      <form action="{% url 'skip_logic:choice_detail' choice.slug %}" method="get">
+        <input class="w3-button w3-blue w3-border w3-round-large w3-hover-indigo w3-hover-shadow w3-tex-pale-blue" type="submit" value="&#xf0e2;&nbsp;&nbsp;Oops, take me back!" />
+      </form>
+    </div>
+    <div class="w3-cell">
+      <form action="#" method="post">
+        {% csrf_token %}
+        <input class="w3-button w3-round-large w3-border w3-hover-dark-grey w3-hover-shadow" type="submit" value="&#xf1f8;&nbsp;&nbsp;Delete this choice forever" />
+      </form>
+    </div>
+  </div>
+{% endblock %}
