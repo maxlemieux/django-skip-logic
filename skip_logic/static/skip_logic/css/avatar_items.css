@@ -1,0 +1,34 @@
+#fancy_cloth_hood {
+    width: 64px;
+    height: 64px; 
+    background: url("http://10.0.0.7/static/skip_logic/armor.png") 0% 25% no-repeat;
+}
+
+#fancy_cloth_tunic {
+    width: 64px;
+    height: 64px; 
+    background: url({% static "skip_logic/armor.png" %});
+    background-repeat: no-repeat;
+    background-position: 64px 64px;
+}
+
+#fancy_cloth_bracers {
+    width: 64px;
+    height: 64px; 
+    background: url("http://10.0.0.7/static/skip_logic/armor.png") 50% 25% no-repeat;
+}
+
+#fancy_cloth_skirt {
+    width: 64px;
+    height: 64px; 
+    background: url({% static "skip_logic/armor.png" %});
+    background-repeat: no-repeat;
+    background-position: 128px 128px;
+}
+
+#fancy_cloth_shoes {
+    width: 64px;
+    height: 64px; 
+    background: url("http://10.0.0.7/static/skip_logic/armor.png") 100% 25% no-repeat;
+}
+
