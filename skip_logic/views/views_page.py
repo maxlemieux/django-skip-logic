@@ -3,6 +3,7 @@ Views for django-skip-logic. Handles surveys, survey results, call to action.
 """
 
 import random
+import re
 import string
 
 from django.db import IntegrityError
@@ -73,8 +74,10 @@ def page_new(request, survey_slug):
                                              string.ascii_lowercase +
                                              string.digits) for _ in range(8))
             if Page.objects.filter(survey=survey).count() > 0:
-                new_page_number = Page.objects.filter(survey=survey).\
-                                               latest('page_number').page_number + 1
+                old_page_number = Page.objects.filter(survey=survey).\
+                                               latest('page_number').page_number
+                match = re.search(r"\d+", old_page_number)
+                new_page_number = int(match.group()) + 1
             else:
                 new_page_number = 1
             form = PageForm(initial={'page_number': new_page_number,

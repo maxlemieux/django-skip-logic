@@ -13,6 +13,19 @@ from django.contrib import messages
 from skip_logic.models import Survey, Question, Choice
 
 from skip_logic.forms import ChoiceForm
+from skip_logic.views.views_core import random_slug
+
+
+def get_new_choice_number(question):
+    """Gets a new choice number. Used when creating new choices."""
+    if Choice.objects.filter(question=question).count() > 0:
+        latest_choice_number = Choice.objects.filter(question=question).\
+                                                     latest('choice_number').choice_number
+        new_choice_number = int(latest_choice_number) + 1
+    else:
+        new_choice_number = 1
+    return new_choice_number
+
 
 
 def choice_detail(request, choice_slug):
@@ -142,3 +155,19 @@ def choice_delete(request, choice_slug):
             return redirect('skip_logic:question_detail', question_slug=question_slug)
     else:
         return Http404("Page not found")
+
+
+def create_yes_and_no_choices(request, question_id):
+    """Create a Yes choice and a No choice for the question."""
+    question = Question.objects.get(id=question_id)
+    yes_choice = Choice.objects.create(question = question,
+                                       choice_text = 'Yes',
+                                       choice_number = get_new_choice_number(question),
+                                       slug = random_slug(8))
+    no_choice = Choice.objects.create(question = question,
+                                      choice_text = 'No',
+                                      choice_number = get_new_choice_number(question),
+                                      slug = random_slug(8))
+    messages.add_message(request, messages.INFO,
+                         "Created new Yes and No choices for question " + str(question.question_text),)
+    return redirect('skip_logic:question_detail', question_slug=question.slug)

@@ -13,6 +13,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib import messages
+from django.contrib.sites.models import Site
 
 from skip_logic.models import Campaign, Survey, ReferralCode
 
@@ -139,7 +140,9 @@ def campaign_referral_codes(request, campaign_id):
     except Campaign.DoesNotExist:
         raise Http404
 
-    # List of just the current referral code surveys
+    domain = Site.objects.get_current().domain
+
+    # List of just the current referral codes' surveys
     referral_codes_distinct_surveys = ReferralCode.objects.\
         filter(campaign=campaign).\
         distinct('survey')
@@ -158,6 +161,7 @@ def campaign_referral_codes(request, campaign_id):
         context = {
             'survey_list': surveys,
             'campaign': campaign,
+            'domain': domain,
             'referral_codes': referral_codes,
         }
 
@@ -171,10 +175,9 @@ def campaign_referral_codes(request, campaign_id):
             raise Http404
 
         count = 0
-
         if request.POST['referral_code_count'] == "0":
             return render(request, 'skip_logic/campaign_referral_codes.html', context)
-        while count < int(request.POST['referral_code_count']) and count < 1000:
+        while count < int(request.POST['referral_code_count']) and count < 1000000:
             random_string = ''.join(random.choice(string.ascii_uppercase +
                                                   string.ascii_lowercase +
                                                   string.digits) for _ in range(16))
@@ -186,7 +189,6 @@ def campaign_referral_codes(request, campaign_id):
                              "Created " + request.POST['referral_code_count'] +
                              " codes for survey " + survey.title +
                              " in campaign \"" + campaign.name + "\"",)
-
         # Dictionary of referral codes with key == survey.title
         new_codes = {}
         for referral_survey in referral_codes_distinct_surveys.values_list('survey__title'):
@@ -194,10 +196,10 @@ def campaign_referral_codes(request, campaign_id):
                                                          filter(campaign=campaign,
                                                                 survey__title=referral_survey[0]).\
                                                          order_by('last_used_date')
-
         context = {
             'survey_list': surveys,
             'campaign': campaign,
+            'domain': domain,
             'referral_codes': new_codes,
         }
 
@@ -206,6 +208,8 @@ def campaign_referral_codes(request, campaign_id):
 
 def process_referral(request, ref_code):
     """Connect referral code to survey."""
+    # Todo: Send to survey home, not 404...also send to home if there is a Last Used Date already on the code
+    # Survey Home Index needs to work the same way - only show untaken surveys
     try:
         referral_code = ReferralCode.objects.get(code=ref_code)
     except ReferralCode.DoesNotExist:
@@ -240,7 +244,7 @@ def process_referral(request, ref_code):
         pass
 
     survey_slug = referral_code.survey.slug
-    page_slug = referral_code.survey.page_survey.all().order_by('slug')[0].slug
+    page_slug = referral_code.survey.page_survey.all().order_by('page_number')[0].slug
 
     return HttpResponseRedirect(reverse('skip_logic:page',
                                         kwargs={'survey_slug': survey_slug,

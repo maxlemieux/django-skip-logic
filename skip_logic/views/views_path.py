@@ -26,15 +26,20 @@ def path_detail(request, path_slug):
     path = get_object_or_404(Path, slug=path_slug)
     my_surveys = Survey.objects.filter(author=request.user).order_by('title')
 
-    if request.user == path.choice.question.page.survey.author:
+    if path.choice:
+        origin = path.choice.question.page
+    else:
+        origin = path.origin_page
+
+    if request.user == origin.survey.author:
         return render(request,
                       'skip_logic/path_detail.html',
-                      {'path': path, 'my_surveys': my_surveys})
+                      {'path': path, 'origin': origin, 'my_surveys': my_surveys})
     return Http404("Page not found")
 
 
 
-def path_new(request, choice_slug):
+def path_new(request, origin_choice_slug=None, origin_page_slug=None):
     """Create a new path."""
     if request.user.is_authenticated:
         if not request.user.groups.filter(name='Survey Creators').exists():
@@ -42,37 +47,61 @@ def path_new(request, choice_slug):
     else:
         raise Http404("Page not found")
 
-    choice = get_object_or_404(Choice, slug=choice_slug)
+    try:
+        choice = get_object_or_404(Choice, slug=origin_choice_slug)
+        origin = choice.question.page
+    except:
+        choice = None
+    try:
+        origin_page = get_object_or_404(Page, slug=origin_page_slug)
+        origin = origin_page
+    except:
+        origin_page = None
+
     my_surveys = Survey.objects.filter(author=request.user).order_by('title')
 
-    if request.user == choice.question.page.survey.author:
+    if request.user == origin.survey.author:
         if request.method == "POST":
             form = PathForm(request.POST)
             if form.is_valid():
                 path = form.save(commit=False)
+                path.origin_page = origin_page
                 path.choice = choice
+#                path.save()
                 try:
                     path.save()
                 except IntegrityError:
                     messages.add_message(request,
                                          messages.INFO,
-                                         "A path for this choice already exists.",)
+                                         "A path from this choice or page already exists.",)
                     return render(request,
                                   'skip_logic/path_edit.html',
-                                  {'form': form, 'path': path, 'my_surveys': my_surveys})
+                                  {'form': form,
+                                   'path': path,
+                                   'choice': choice,
+                                   'origin_page': origin_page,
+                                   'origin': origin,
+                                   'my_surveys': my_surveys})
                 messages.add_message(request, messages.INFO, "Created new path.",)
-                return redirect('skip_logic:path_detail', path_slug=path.slug)
+                if origin_page == None:
+                    return redirect('skip_logic:path_detail', path_slug=path.slug)
+                else:  # this is a Page Path
+                    return redirect('skip_logic:path_detail_pagepath', path_slug=path.slug)
         else:
             new_slug = ''.join(random.choice(string.ascii_uppercase +
                                              string.ascii_lowercase +
                                              string.digits) for _ in range(8))
             form = PathForm(initial={'slug': new_slug})
             form.fields['page'].queryset = \
-                Page.objects.filter(survey=choice.question.page.survey).\
-                                    exclude(id=choice.question.page.id)
+                Page.objects.filter(survey=origin.survey).\
+                                    exclude(id=origin.id)
         return render(request,
                       'skip_logic/path_edit.html',
-                      {'form': form, 'choice': choice, 'my_surveys': my_surveys})
+                      {'form': form,
+                       'choice': choice,
+                       'origin_page': origin_page,
+                       'origin': origin,
+                       'my_surveys': my_surveys})
     else:
         return Http404("Page not found")
 

@@ -2,6 +2,9 @@
 Views for django-skip-logic. Handles surveys, survey results, call to action.
 """
 
+import random
+import string
+
 from ipware.ip import get_ip
 
 from django.http import HttpResponseRedirect, Http404
@@ -14,6 +17,13 @@ from django.contrib.auth.models import User
 from skip_logic.models import Survey, Page, Question, Path
 from skip_logic.models import Reward
 from skip_logic.models import QuestionResult
+
+
+def random_slug(slug_size):
+    random_slug = ''.join(random.choice(string.ascii_uppercase +
+                                 string.ascii_lowercase +
+                                 string.digits) for _ in range(slug_size))
+    return random_slug
 
 
 def equality_check(first, second):
@@ -102,66 +112,67 @@ def vote(request, page_slug):
     page = get_object_or_404(Page, slug=page_slug)
     survey = get_object_or_404(Survey, pk=page.survey.id)
 
-    counter = 1
-    for this_question in Question.objects.filter(page__id=page.id):
-        choice_label = "choice" + str(counter)
-        selected_choice = this_question.choice_question.get(pk=request.POST[choice_label])
-        input_label = "inputfield" + str(counter)
+    if Question.objects.filter(page__id=page.id).count() > 0:
+        counter = 1
+        for this_question in Question.objects.filter(page__id=page.id):
+            choice_label = "choice" + str(counter)
+            selected_choice = this_question.choice_question.get(pk=request.POST[choice_label])
+            input_label = "inputfield" + str(counter)
+            try:
+                input_text = request.POST[input_label]
+            except KeyError:
+                input_text = ''
+            # Create a new QuestionResult object to store the user's answer
+            sessionkey = request.session.session_key
+            if (request.user == survey.author or QuestionResult.objects.filter(user_ip_address=get_ip(request), question=this_question).count() == 0):
+                if request.user.is_authenticated:
+                    QuestionResult.objects.create(
+                        user=request.user,
+                        username=request.user.username,
+                        question=this_question,
+                        result_object=selected_choice,
+                        input_text=input_text,
+                        session=sessionkey,
+                        user_ip_address=get_ip(request),
+                    )
+                else:
+                    QuestionResult.objects.create(
+                        username="anonymous",
+                        question=this_question,
+                        result_object=selected_choice,
+                        input_text=input_text,
+                        session=sessionkey,
+                        user_ip_address=get_ip(request),
+                    )
+                    request.session['key_copy'] = sessionkey
+            counter = counter + 1
+    else:
+        selected_choice = None
+
+    # Get path from page or choice.
+    # The default is to go to the Call to Action
+    if selected_choice == None:
         try:
-            input_text = request.POST[input_label]
-        except KeyError:
-            input_text = ''
-        # Create a new QuestionResult object to store the user's answer
-        sessionkey = request.session.session_key
-        if request.user.is_authenticated:
-            QuestionResult.objects.create(
-                user=request.user,
-                username=request.user.username,
-                question=this_question,
-                result_object=selected_choice,
-                input_text=input_text,
-                session=sessionkey,
-                user_ip_address=get_ip(request),
-            )
-        else:
-            QuestionResult.objects.create(
-                username="anonymous",
-                question=this_question,
-                result_object=selected_choice,
-                input_text=input_text,
-                session=sessionkey,
-                user_ip_address=get_ip(request),
-            )
-            request.session['key_copy'] = sessionkey
-        counter = counter + 1
-
-    # Get path in case we are branching/skipping questions.
-    # The default is to go to the next sequential Page Number, so this is only used if present.
-    if Path.objects.filter(choice=selected_choice).exists():
-        path = Path.objects.get(choice=selected_choice).page.slug
+            path = Path.objects.get(origin_page=page).page.slug
+        except:
+            return HttpResponseRedirect(reverse('skip_logic:completed', args=(survey.slug,)))
     else:
-        next_page = Page.objects.filter(survey=page.survey, page_number__gt=page.page_number).\
-                                 order_by('page_number').first()
-        if next_page:
-            path = next_page.slug
-    # Send to the next sequential page.
-    # If it's the last page, send to the call to action.
-    if page.is_last:
-        if request.user.is_authenticated:
-            reward_currency = 50
-            reward_message = "You earned +" + str(reward_currency) + " reward points"
-            request.user.userprofile.receive_currency(reward_currency)
-            messages.add_message(request, messages.INFO, reward_message)
+        try:
+            path = Path.objects.get(choice=selected_choice).page.slug
+        except Path.DoesNotExist:
+            try:
+                path = Path.objects.get(origin_page=page).page.slug
+            except:
+                return HttpResponseRedirect(reverse('skip_logic:completed', args=(survey.slug,)))
 
-        return HttpResponseRedirect(reverse('skip_logic:completed', args=(survey.slug,)))
-    else:
-        if request.user.is_authenticated:
-            reward_currency = 5
-            reward_message = "You earned +" + str(reward_currency) + " reward points"
-            request.user.userprofile.receive_currency(reward_currency)
-            messages.add_message(request, messages.INFO, reward_message)
+#    if request.user.is_authenticated:
+#        reward_currency = 5
+#        reward_message = "You earned +" + str(reward_currency) + " reward points"
+#        request.user.userprofile.receive_currency(reward_currency)
+#            messages.add_message(request, messages.INFO, reward_message)
 
-        # Always return an HttpResponseRedirect after successfully dealing
-        # with POST data. This prevents data from being posted twice if a
-        # user hits the Back button.
-        return HttpResponseRedirect(reverse('skip_logic:page', args=(survey.slug, path)))
+    # Always return an HttpResponseRedirect after successfully dealing
+    # with POST data. This prevents data from being posted twice if a
+    # user hits the Back button.
+
+    return HttpResponseRedirect(reverse('skip_logic:page', args=(survey.slug, path)))
