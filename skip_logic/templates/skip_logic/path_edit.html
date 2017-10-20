@@ -8,24 +8,22 @@
 {% block breadcrumbs %}
 <a href="{% url 'skip_logic:survey_index' %}" class="w3-round w3-hover-pale-blue">
 My Surveys</a> > 
-{% if "new" in request.path %}
-<a href="{% url 'skip_logic:survey_detail' choice.question.page.survey.slug %}" class="w3-round w3-hover-pale-blue">
-<i class="fa fa-list-alt" aria-hidden="true"></i> <strong>{{ choice.question.page.survey.title }}</strong></a> > 
-<a href="{% url 'skip_logic:page_detail' choice.question.page.slug %}" class="w3-round w3-hover-pale-blue">
-<i class="fa fa-file-o" aria-hidden="true"></i> <strong>{{ choice.question.page.title }}</strong></a> > 
-<a href="{% url 'skip_logic:question_detail' choice.question.slug %}" class="w3-round w3-hover-pale-blue">
-<i class="fa fa-question-circle-o" aria-hidden="true"></i> <strong>{{ choice.question.question_text }}</strong></a> > 
-<a href="{% url 'skip_logic:choice_detail' choice.slug %}" class="w3-round w3-hover-pale-blue">
-<i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>{{ choice.choice_text }}</strong></a> > 
-{% else %}
-<a href="{% url 'skip_logic:survey_detail' path.choice.question.page.survey.slug %}" class="w3-round w3-hover-pale-blue">
-<i class="fa fa-list-alt" aria-hidden="true"></i> <strong>{{ path.choice.question.page.survey.title }}</strong></a> > 
-<a href="{% url 'skip_logic:page_detail' path.choice.question.page.slug %}" class="w3-round w3-hover-pale-blue">
-<i class="fa fa-file-o" aria-hidden="true"></i> <strong>{{ path.choice.question.page.title }}</strong></a> > 
-<a href="{% url 'skip_logic:question_detail' path.choice.question.slug %}" class="w3-round w3-hover-pale-blue">
-<i class="fa fa-question-circle-o" aria-hidden="true"></i> <strong>{{ path.choice.question.question_text }}</strong></a> > 
-<a href="{% url 'skip_logic:choice_detail' path.choice.slug %}" class="w3-round w3-hover-pale-blue">
-<i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>{{ path.choice.choice_text }}</strong></a> > 
+  <a href="{% url 'skip_logic:survey_detail' origin.survey.slug %}" class="w3-round w3-hover-pale-blue">
+  <i class="fa fa-list-alt" aria-hidden="true"></i> <strong>{{ origin.survey.title }}</strong></a> > 
+  <a href="{% url 'skip_logic:page_detail' origin.slug %}" class="w3-round w3-hover-pale-blue">
+  <i class="fa fa-file-o" aria-hidden="true"></i> <strong>{{ origin.title }}</strong></a> > 
+{% if 'choice' in request.path %}
+  {% if 'new' in request.path %}
+    <a href="{% url 'skip_logic:question_detail' choice.question.slug %}" class="w3-round w3-hover-pale-blue">
+    <i class="fa fa-question-circle-o" aria-hidden="true"></i> <strong>{{ choice.question.question_text }}</strong></a> > 
+    <a href="{% url 'skip_logic:choice_detail' choice.slug %}" class="w3-round w3-hover-pale-blue">
+    <i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>{{ choice.choice_text }}</strong></a> > 
+  {% else %}
+    <a href="{% url 'skip_logic:question_detail' path.choice.question.slug %}" class="w3-round w3-hover-pale-blue">
+    <i class="fa fa-question-circle-o" aria-hidden="true"></i> <strong>{{ path.choice.question.question_text }}</strong></a> > 
+    <a href="{% url 'skip_logic:choice_detail' path.choice.slug %}" class="w3-round w3-hover-pale-blue">
+    <i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>{{ path.choice.choice_text }}</strong></a> > 
+  {% endif %}
 {% endif %}
 
 {% if "new" in request.path %}Create Path{% else %}Edit Path{% endif %}
@@ -40,10 +38,19 @@ My Surveys</a> >
     <form method="POST" id="form_edit" name="form_edit">
       {% csrf_token %}
       <table class="w3-table">
+      {% if "choice" in request.path %}
         <tr>
           <td style="width:30%;">Choice:</td>
-          <td>"{{ path.choice.choice_text }}" (Page {{ path.choice.question.page.page_number }})</td>
+          <td>"{% if 'new' in request.path %}{{ choice.choice_text }}{% else %}{{ path.choice.choice_text }}{% endif %}"
+            (Page {% if 'new' in request.path %}{{ choice.question.page.page_number }}{% else %}{{ origin.page_number }}{% endif %})
+          </td>
         </tr>
+      {% else %}
+        <tr>
+          <td style="width:30%;">Origin Page:</td>
+          <td>"{% if 'new' in request.path %}{{ origin_page.title }}{% else %}{{ path.origin_page.title }}{% endif %}"</td>
+        </tr>
+      {% endif %}
         <tr>
           <td style="width:30%;"><label for="id_page">Choose a destination page:</label></td>
           <td>{{ form.page }}</td>
@@ -57,8 +64,15 @@ My Surveys</a> >
       <p>Tip: The default URL slug, used to access this path, is random lower, upper, digit * 8. You can change it to anything you like, as long as it's unique within this survey and contains only letters and numbers.</p>
 
       <div style="text-align:right;">
-        <a href="{% if 'new' in request.path %}{% url 'skip_logic:choice_detail' choice.slug %}{% else %}{% url 'skip_logic:path_detail' path.slug %}{% endif %}"
-           class="w3-margin w3-button w3-border w3-hover-shadow w3-round-large">
+      {% if 'new' in request.path %}
+        {% if 'choice' in request.path %}
+          <a href="{% url 'skip_logic:choice_detail' choice.slug %}" class="w3-margin w3-button w3-border w3-hover-shadow w3-round-large">
+        {% else %}
+          <a href="{% url 'skip_logic:page_detail' origin.slug %}" class="w3-margin w3-button w3-border w3-hover-shadow w3-round-large">
+        {% endif %}
+      {% else %}
+        <a href="{% url 'skip_logic:path_detail' path.slug %}" class="w3-margin w3-button w3-border w3-hover-shadow w3-round-large">
+      {% endif %}
            <i class="fa fa-undo" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
         </a>
 

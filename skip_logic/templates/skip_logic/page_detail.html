@@ -16,21 +16,12 @@ My Surveys</a> >
 {% block page %}
   <h1 class="w3-center">Page: {{ page.title }}</h1>
 
-  {% if page.question_page.all|length == 0 %}
-  <div id="nextstep_question" class="w3-padding w3-margin w3-border w3-sand">
-    <span class="w3-text-dark-grey closebtn" onclick="$('#nextstep_question').slideUp();">&times;</span>
-    <p><strong>Next steps: Add a Question</strong></p>
-    <p>You need at least one question for your page!</p>
-    <p>Click the "Add New Question..." button below to create a new question for your page.</p>
-  </div>
-  {% endif %}
-
   <div class="w3-card w3-padding w3-light-grey">
     <h3><i class="fa fa-file-o" aria-hidden="true"></i>&nbsp;&nbsp;Page Details</h3>
     <p><strong>Title:</strong> {{ page.title }}</p>
-    <p><strong>Page Text:</strong> {{ page.page_text }}</p>
+    <p><strong>Page Text:</strong></p>
+    <p>{{ page.page_text|truncatechars:100 }}</p>
     <p><strong>Page Number:</strong> {{ page.page_number }}</p>
-    <p><strong>Send to Call to Action:</strong> {% if page.is_last %}Yes{% else %}No{% endif %}</p>
     <p><strong>URL Slug:</strong> {{ page.slug }}</p>
     <div class="w3-cell-row w3-margin w3-center">
       <div class="w3-cell">
@@ -89,25 +80,33 @@ My Surveys</a> >
     <div class="w3-round-large w3-border w3-padding w3-margin">
     {% if page.path_page.all|length > 0 %}
         <h5>Inbound Paths:</h5>
-    {% else %}
-        There are no inbound paths for this page.
-    {% endif %}
       <div class="w3-cell-row w3-center w3-margin-top">
         {% for path in page.path_page.all %}
           <div class="w3-cell w3-container">
             <div class="w3-border" style="padding:5px;">
+
+            {% if path.choice %}
               <a style="text-decoration:none;" 
                  href="{% url 'skip_logic:page_detail' path.choice.question.page.slug %}">
+            {% else %}
+              <a style="text-decoration:none;" 
+                 href="{% url 'skip_logic:page_detail' path.origin_page.slug %}">
+            {% endif %}
                 <div class="w3-card w3-blue w3-hover-shadow" 
-                     style="height:75px; margin:auto; margin-bottom:20px; padding:5px;">
+                     style="height:75px; margin:auto; padding:5px;">
                   <strong><i class="fa fa-file-o" aria-hidden="true"></i>&nbsp;&nbsp;Page</strong><br>
+                {% if path.choice %}
                   <small>{{ path.choice.question.page.title|truncatechars:40 }}</small>
+                {% else %}
+                  <small>{{ path.origin_page.title|truncatechars:40 }}</small>
+                {% endif %}
                 </div>
               </a>
+            {% if path.choice %}
               <a style="text-decoration:none;" 
                  href="{% url 'skip_logic:question_detail' path.choice.question.slug %}">
                 <div class="w3-card w3-pale-blue w3-hover-shadow" 
-                     style="height:75px; margin:auto; margin-bottom:20px; padding:5px;">
+                     style="height:75px; margin:auto; margin-top:20px; margin-bottom:20px; padding:5px;">
                      <i class="fa fa-question-circle-o" aria-hidden="true"></i>&nbsp;&nbsp;<strong>Question</strong><br>
                   <small>{{ path.choice.question.question_text|truncatechars:40 }}</small>
                 </div>
@@ -120,11 +119,16 @@ My Surveys</a> >
                   <small>{{ path.choice.choice_text|truncatechars:40 }}</small>
                 </div>
               </a>
+            {% endif %}              
+
             </div>
             <div><h2><i class="fa fa-long-arrow-down" aria-hidden="true"></i></h2></div>
           </div>
         {% endfor %}
       </div>
+    {% else %}
+        There are no inbound paths for this page.
+    {% endif %}
 
       <div class="w3-cell-row w3-center">
         <div class="w3-cell w3-container">
@@ -135,11 +139,27 @@ My Surveys</a> >
       </div>
 
       <div class="w3-cell-row w3-center">
+        {% for this_path in page.origin_page.all %}
+            <div class="w3-cell w3-container">
+              <div class="w3-border" style="padding:10px;margin:10px;">
+                <div><h2><i class="fa fa-long-arrow-down" aria-hidden="true"></i></h2></div>
+                <a style="text-decoration:none;" 
+                   href="{% url 'skip_logic:page_detail' this_path.page.slug %}">
+                  <div class="w3-card w3-blue w3-hover-shadow" 
+                       style="height:75px; margin:auto; padding:5px;">
+                    <strong><i class="fa fa-file-o" aria-hidden="true"></i>&nbsp;&nbsp;Page</strong><br>
+                    <small>{{ this_path.page.title|truncatechars:40 }}</small>
+                  </div>
+                </a>
+              </div>
+            </div>
+        {% endfor %}
+
         {% for this_question in page.question_page.all %}
           {% for this_choice in this_question.choice_question.all %}
             {% for this_path in this_choice.path_choice.all %}
             <div class="w3-cell w3-container">
-              <div class="w3-border" style="padding:10px;">
+              <div class="w3-border" style="padding:10px;margin:10px;">
                 <a style="text-decoration:none;" 
                    href="{% url 'skip_logic:question_detail' this_path.choice.question.slug %}">
                   <div class="w3-card w3-pale-blue w3-hover-shadow" 
@@ -165,7 +185,6 @@ My Surveys</a> >
                     <small>{{ this_path.page.title|truncatechars:40 }}</small>
                   </div>
                 </a>
-
               </div>
             </div>
             {% endfor %}
@@ -174,16 +193,24 @@ My Surveys</a> >
       </div>
     </div>
 
+    <h3>Inbound Paths</h3>
     {% if page.path_page.all|length > 0 %}
-    <table class="w3-table-all" style="width:95%;margin:auto;margin-bottom:23px;">
-      <tr><th>Inbound Paths</th><th></th></tr>
+    <table class="w3-table-all" style="margin:auto;">
     {% for path in page.path_page.all %}
       <tr>
         <td>
-          <strong>Page:</strong> {{ path.choice.question.page.title }} &nbsp;&nbsp;<i class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;<strong>Choice:</strong> {{ path.choice.choice_text }}&nbsp;&nbsp;<i class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;<strong>This Page:</strong> {{ path.page.title }}
+        {% if path.choice %}
+          <strong>Page:</strong> {{ path.choice.question.page.title }} &nbsp;&nbsp;
+          <i class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;
+          <strong>Choice:</strong> {{ path.choice.choice_text }}&nbsp;&nbsp;
+        {% else %}
+          <strong>Page:</strong> {{ path.origin_page.title }} &nbsp;&nbsp;
+        {% endif %}
+          <i class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;
+          <strong>This Page:</strong> {{ path.page.title }}
         </td>
-        <td class="w3-right">
-          <a class="w3-button-blue"
+        <td>
+          <a class="w3-button-blue w3-right"
                href="{% url 'skip_logic:path_detail' path_slug=path.slug %}">
                <i class="fa fa-edit" aria-hidden="true"></i>&nbsp;&nbsp;Details
           </a>
@@ -191,11 +218,43 @@ My Surveys</a> >
       </tr>
     {% endfor %}
     </table>
+    {% else %}
+      <div class="w3-card w3-sand w3-margin w3-padding">
+        <h5>No inbound paths found</h5>
+      </div>
     {% endif %}
 
-    {% if page.question_page_all|length > 0 %}
-    <table class="w3-table-all w3-text-dark-grey" style="width:95%; margin: auto; margin-bottom:20px;">
-      <tr><th>Outbound Paths</th><th></th></tr>
+    <h3>Outbound Paths</h3>
+
+    {% if page.origin_page.all|length > 0 %}
+    <table class="w3-table-all" style="margin:auto;">
+      {% for this_path in page.origin_page.all %}
+              <tr>
+                <td>
+                  <strong>This Page:</strong> {{ page.title }}&nbsp;&nbsp;
+                  <i class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;
+                  <strong>Destination Page:</strong> {{ this_path.page.title }}
+                </td>
+                <td class="w3-right">
+                  <a class="w3-button-blue"
+                       href="{% url 'skip_logic:path_detail_pagepath' path_slug=this_path.slug %}">
+                       <i class="fa fa-edit" aria-hidden="true"></i>&nbsp;&nbsp;Details
+                   </a>
+                </td>
+              </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <div class="w3-container w3-center w3-margin">
+      <a class="w3-button-blue w3-large" title="Click to add new page-level path"
+         href="{% url 'skip_logic:path_new_pagepath' origin_page_slug=page.slug %}">
+        <i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add New Path...
+      </a>
+    </div>
+    {% endif %}
+
+    {% if page.question_page.all|length > 0 %}
+    <table class="w3-table-all" style="margin:auto;">
       {% for this_question in page.question_page.all %}
         {% for this_choice in this_question.choice_question.all %}
           {% if this_choice.path_choice.count > 0 %}
@@ -217,14 +276,12 @@ My Surveys</a> >
           {% endif %}
         {% endfor %}
       {% endfor %}
+    </table>
     {% else %}
       <div class="w3-card w3-sand w3-margin w3-padding w3-text-dark-grey">
         <h5>No outbound paths found</h5>
-        <p>There are no outbound paths for this page. To create a path, first add a choice to a question, then add a path from that choice to the page you want to go to next.</p>
-        <p><strong>Default next page:</strong> Page number {{ page.page_number|add:1 }}.</p>
       </div>
     {% endif %}
-    </table>
   </div>
 
   <div class="w3-center w3-margin">
@@ -234,7 +291,6 @@ My Surveys</a> >
     </a>
   </div>
 
-{% comment %}
-</div>
-{% endcomment %}
+{{ request.get_full_path }}
+
 {% endblock %}

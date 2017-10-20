@@ -8,21 +8,18 @@
 {% block breadcrumbs %}
 <a href="{% url 'skip_logic:survey_index' %}" class="w3-round w3-hover-pale-blue">
 My Surveys</a> >
-<a href="{% url 'skip_logic:survey_detail' path.choice.question.page.survey.slug %}" 
-   class="w3-round w3-hover-pale-blue">
-<strong>{{ path.choice.question.page.survey.title }}</strong></a> >
+<a href="{% url 'skip_logic:survey_detail' origin.survey.slug %}" class="w3-round w3-hover-pale-blue">
+<strong>{{ origin.survey.title }}</strong></a> >
+<a href="{% url 'skip_logic:page_detail' origin.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-file-o" aria-hidden="true"></i> <strong>{{ origin.title }}</strong></a> > 
 
-<a href="{% url 'skip_logic:page_detail' path.choice.question.page.slug %}" 
-   class="w3-round w3-hover-pale-blue">
-<i class="fa fa-file-o" aria-hidden="true"></i> <strong>{{ path.choice.question.page.title }}</strong></a> > 
-
-<a href="{% url 'skip_logic:question_detail' path.choice.question.slug %}" 
-   class="w3-round w3-hover-pale-blue">
+{% if 'choice' in request.path %}
+<a href="{% url 'skip_logic:question_detail' path.choice.question.slug %}" class="w3-round w3-hover-pale-blue">
 <i class="fa fa-question-circle-o" aria-hidden="true"></i> <strong>{{ path.choice.question.question_text }}</strong></a> > 
+<a href="{% url 'skip_logic:choice_detail' path.choice.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>{{ path.choice.choice_text }}</strong></a> >
+{% endif %}
 
-<a href="{% url 'skip_logic:choice_detail' path.choice.slug %}" 
-   class="w3-round w3-hover-pale-blue">
-   <i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>{{ path.choice.choice_text }}</strong></a> >
 Details for path
 {% endblock %}
 
@@ -32,7 +29,11 @@ Details for path
   <div class="w3-cell-row w3-center w3-margin w3-padding">
     <div class="w3-cell">
       <div class="w3-card w3-light-grey w3-text-dark-grey">
+      {% if 'choice' in request.path %}
         <h3>Choice: {{ path.choice.choice_text }}</h3>
+      {% else %}
+        <h3>Origin Page: {{ path.origin_page.title }}</h3>
+      {% endif %}
       </div>
     </div>
     <div class="w3-cell" style="width:20%;">
@@ -47,8 +48,12 @@ Details for path
 
   <div class="w3-card w3-padding w3-light-grey">
     <h3><i class="fa fa-arrow-right" aria-hidden="true"></i> Path Details</h3>
+  {% if 'choice' in request.path %}
     <p><strong>Choice:</strong> <a href="{% url 'skip_logic:choice_detail' path.choice.slug %}">{{ path.choice.choice_text }}</a></p>
-    <p><strong>Destination Page:</strong> <a href="{% url 'skip_logic:page_detail' path.choice.question.page.slug %}">{{ path.page.title }}</a></p>
+  {% else %}
+    <p><strong>Origin Page:</strong> <a href="{% url 'skip_logic:page_detail' path.origin_page.slug %}">{{ path.origin_page.title }}</a></p>
+  {% endif %}
+    <p><strong>Destination Page:</strong> <a href="{% url 'skip_logic:page_detail' path.page.slug %}">{{ path.page.title }}</a></p>
     <p><strong>URL Slug:</strong> {{ path.slug }}</p>
 
     <div class="w3-cell-row w3-margin w3-center">
@@ -70,9 +75,16 @@ Details for path
   </div>
 
   <div class="w3-container w3-center w3-margin">
+  {% if 'choice' in request.path %}
     <a class="w3-button w3-border w3-hover-shadow w3-round-large w3-text-dark-grey"
        href="{% url 'skip_logic:choice_detail' choice_slug=path.choice.slug %}">
       <i class="fa fa-undo" aria-hidden="true"></i>&nbsp;&nbsp;Back to Choice
     </a>
+  {% else %}
+    <a class="w3-button w3-border w3-hover-shadow w3-round-large w3-text-dark-grey"
+       href="{% url 'skip_logic:page_detail' page_slug=path.origin_page.slug %}">
+      <i class="fa fa-undo" aria-hidden="true"></i>&nbsp;&nbsp;Back to Page
+    </a>
+  {% endif %}
   </div>
 {% endblock %}

@@ -10,12 +10,12 @@
 
   {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-  <div>
+  <div class="w3-margin w3-container">
   {% if page_question_list %}
 
     {% if page.page_text %}
     <div class="w3-container w3-center">
-      <h4 class="w3-center">{{ page.page_text }}</h4>
+      <h4 class="w3-center">{{ page.page_text|safe }}</h4>
     </div>
     {% endif %}
 
@@ -23,7 +23,7 @@
       <form action="{% url 'skip_logic:vote' page.slug %}" method="post">
       {% csrf_token %}
       {% for question in page_question_list %}
-        <h3>{{ question.question_text }}</h3>
+        <h3>{{ question.question_text|safe }}</h3>
       {% if question.layout_horizontal == True %}
         <div class="w3-container w3-cell-row">
       {% endif %}
@@ -72,29 +72,18 @@
     {% endif %}
   {% endfor %}
       <div class="w3-container" style="width:100%;">
-      {% if page.is_last == True %}
-        <div class="w3-margin w3-center"><input type="submit" value="Finish" class="w3-button-blue w3-margin" /></div>
-      {% else %}
-        <div class="w3-margin w3-center"><input type="submit" value="Next" class="w3-button-blue" /></div>
-      {% endif %}
+        <div class="w3-margin w3-center"><input type="submit" value="Next" class="w3-button w3-blue w3-hover-indigo w3-text-pale-blue w3-hover-shadow w3-round-large" /></div>
       </div>
     </form>
-
-  </div>
-
 {% else %}
-    <p>{{ page.page_text }}</p>
-    <form action="{% url 'skip_logic:vote' page.id %}" method="post">
+    <div class="w3-margin"><p>{{ page.page_text|safe }}</p></div>
+    <form action="{% url 'skip_logic:vote' page.slug %}" method="post">
     {% csrf_token %}
       <div class="w3-container" style="width:100%;">
-      {% if page.is_last == True %}
-        <div class="w3-margin w3-center"><input type="submit" value="Finish" class="w3-button-blue w3-margin" /></div>
-      {% else %}
-        <div class="w3-margin w3-center"><input type="submit" value="Next" class="w3-button-blue" /></div>
-      {% endif %}
+        <div class="w3-margin w3-center"><input type="submit" value="Next" class="w3-button w3-blue w3-hover-indigo w3-text-pale-blue w3-hover-shadow w3-round-large" /></div>
       </div>
     </form>
-  {% endif %}
+{% endif %}
   </div>
 
 {% endblock %}

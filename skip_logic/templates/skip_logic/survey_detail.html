@@ -14,41 +14,6 @@
 
   <h1 class="w3-center w3-margin">Survey: {{ survey.title }}</h1>
 
-  {% if survey.page_survey.all|length == 0 %}
-  <div id="nextstep_page" class="w3-padding w3-margin w3-border w3-sand">
-    <span class="w3-text-dark-grey closebtn" onclick="$('#nextstep_page').slideUp();">&times;</span>
-    <p><strong>Next steps: Add a Page</strong></p>
-    <p>You need at least one page before your survey can be taken!</p>
-    <p>Click the "Add New Page..." button below to create a new page for your survey.</p>
-  </div>
-  {% endif %}
-
-  {% if survey.call_to_action_url is None or survey.call_to_action_label is None or survey.call_to_action_text is None %}
-  <div id="nextstep_cta" class="w3-padding w3-margin w3-border w3-sand">
-    <span class="w3-text-dark-grey closebtn" onclick="$('#nextstep_cta').slideUp();">&times;</span>
-    <p><strong>Next steps: Call to Action</strong></p>
-    <p>Your survey needs a complete Call to Action! Here's what you need to do:</p>
-    <ul class="w3-margin">
-  {% if survey.call_to_action_url is None %}
-      <li>In the Call to Action URL field, enter the address of the website where you want to send survey visitors.</li>
-  {% else %}
-      <li>Call to Action URL: Completed!</li>
-  {% endif %}
-  {% if survey.call_to_action_label is None %}
-      <li>Put the text you want to show for the CTA link in the Call to Action Label field.</li>
-  {% else %}
-      <li>Call to Action Label: Completed!</li>
-  {% endif %}
-  {% if survey.call_to_action_text is None %}
-      <li>Add a pitch in the Call to Action Text field.</li>
-  {% else %}
-      <li>Call to Action Text: Completed!</li>
-  {% endif %}
-    </ul>
-  </div>
-  {% endif %}
-
-
   <div class="w3-card w3-padding w3-light-grey">
     <h3><i class="fa fa-list-alt" aria-hidden="true"></i>&nbsp;&nbsp;Survey Details</h3>
     <p><strong>Title:</strong> {{ survey.title }}</p>
@@ -57,8 +22,15 @@
     <p><strong>URL Slug:</strong> {{ survey.slug }}</p>
     <p><strong>Call to Action URL:</strong> {{ survey.call_to_action_url }}</p>
     <p><strong>Call to Action Label:</strong> {{ survey.call_to_action_label }}</p>
-    <p><strong>Call to Action Text:</strong> {{ survey.call_to_action_text }}</p>
+    <p><strong>Call to Action Text:</strong> {{ survey.call_to_action_text|safe }}</p>
     <div class="w3-cell-row w3-margin w3-center">
+      <div class="w3-cell">
+        <div class="w3-button w3-hover-shadow w3-green w3-hover-green w3-round-large w3-margin-left w3-border">
+          <a style="text-decoration:none;" href="{% url 'skip_logic:page' survey.slug survey.page_survey.all.0.slug %}" class="w3-text-light-grey">
+            <i class="fa fa-play" aria-hidden="true"></i>&nbsp;&nbsp;Start
+          </a>
+        </div>
+      </div>
       <div class="w3-cell">
         <a class="w3-button-blue"
            href="{% url 'skip_logic:survey_edit' survey_slug=survey.slug %}">
@@ -94,7 +66,7 @@
       <tr>
         <td>{{ page.page_number }}</td>
         <td>{{ page.title }}</td>
-        <td>{% if page.is_last %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}{% endif %}</td>
+        <td>{% if page.path_page.count|length is 0 %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}{% endif %}</td>
         <td>{{ page.slug }}</td>
         <td class="w3-right"><a class="w3-button-blue" 
                href="{% url 'skip_logic:page_detail' page.slug %}">

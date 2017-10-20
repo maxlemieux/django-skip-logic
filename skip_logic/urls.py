@@ -71,12 +71,21 @@ urlpatterns = [
     # Choice Delete
     url(r'^surveys/page/question/choice/(?P<choice_slug>[0-9A-Za-z]+)/remove/$',
         views.choice_delete, name='choice_delete'),
+    # Create Yes and No Choices
+    url(r'^surveys/page/question/(?P<question_id>[0-9A-Za-z]+)/create_yes_and_no_choices/$',
+        views.create_yes_and_no_choices, name='create_yes_and_no_choices'),
     # Path creation
-    url(r'^surveys/page/question/choice/(?P<choice_slug>[0-9A-Za-z]+)/path/new/$',
+    url(r'^surveys/page/question/choice/(?P<origin_choice_slug>[0-9A-Za-z]+)/path/new/$',
         views.path_new, name='path_new'),
+    # Path creation (Page Path)
+    url(r'^surveys/page/(?P<origin_page_slug>[0-9A-Za-z]+)/path/new/$',
+        views.path_new, name='path_new_pagepath'),
     # Path detail
     url(r'^surveys/page/question/choice/path/(?P<path_slug>[0-9A-Za-z]+)/detail/$',
         views.path_detail, name='path_detail'),
+    # Path detail (Page Path)
+    url(r'^surveys/page/path/(?P<path_slug>[0-9A-Za-z]+)/detail/$',
+        views.path_detail, name='path_detail_pagepath'),
     # Path edit
     url(r'^surveys/page/question/choice/path/(?P<path_slug>[0-9A-Za-z]+)/edit/$',
         views.path_edit, name='path_edit'),

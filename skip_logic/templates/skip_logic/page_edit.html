@@ -46,7 +46,7 @@ $( function() {
           <td>
         {{ form.page_number.errors }}
         <label for="{{ form.page_text.id_for_label }}"><strong>Page Number:</strong></label>
-            <p><small>Must be unique within survey; determines default page order.</small></p>
+            <p><small>For internal use. Does not show on survey page.</small></p>
           </td>
           <td>
             {{ form.page_number }}
@@ -54,7 +54,7 @@ $( function() {
         </tr>
         <tr>
           <td>
-            {{ form.is_last.errors }}
+            {{ form.slug.errors }}
             <label for="{{ form.slug.id_for_label }}"><strong>URL Slug:</strong></label>
             <p><small>Must be unique within survey pages; forms part of survey taking URLs.</small></p>
           </td>
@@ -70,15 +70,6 @@ $( function() {
           </td>
           <td>
             {{ form.page_text }}
-          </td>
-        </tr>
-        <tr>
-          <td>
-            {{ form.is_last.errors }}
-            <label for="{{ form.is_last.id_for_label }}">Send to Call to Action?</label>
-          </td>
-          <td>
-            {{ form.is_last }}
           </td>
         </tr>
       </table>

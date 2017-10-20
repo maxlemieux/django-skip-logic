@@ -9,21 +9,17 @@
 <a href="{% url 'skip_logic:survey_index' %}"  class="w3-round w3-hover-light-blue">
 My Surveys</a> > 
 
-<a href="{% url 'skip_logic:survey_detail' path.choice.question.page.survey.slug %}"
-   class="w3-round w3-hover-pale-blue">
-<i class="fa fa-list-alt" aria-hidden="true"></i> {{ path.choice.question.page.survey.title }}</strong></a> >
+<a href="{% url 'skip_logic:survey_detail' origin.survey.slug %}" class="w3-round w3-hover-pale-blue">
+<strong>{{ origin.survey.title }}</strong></a> >
+<a href="{% url 'skip_logic:page_detail' origin.slug %}" class="w3-round w3-hover-pale-blue">
+<i class="fa fa-file-o" aria-hidden="true"></i> <strong>{{ origin.title }}</strong></a> >
 
-<a href="{% url 'skip_logic:page_detail' path.choice.question.page.slug %}"
-   class="w3-round w3-hover-pale-blue">
-<i class="fa fa-file-o" aria-hidden="true"></i> <strong>{{ path.choice.question.page.title }}</strong></a> >
-
-<a href="{% url 'skip_logic:question_detail' path.choice.question.slug %}"
-   class="w3-round w3-hover-pale-blue">
+{% if 'choice' in request.path %}
+<a href="{% url 'skip_logic:question_detail' path.choice.question.slug %}" class="w3-round w3-hover-pale-blue">
 <i class="fa fa-question-circle-o" aria-hidden="true"></i> <strong>{{ path.choice.question.question_text }}</strong></a> >
-
-<a href="{% url 'skip_logic:choice_detail' path.choice.slug %}"
-   class="w3-round w3-hover-pale-blue">
+<a href="{% url 'skip_logic:choice_detail' path.choice.slug %}" class="w3-round w3-hover-pale-blue">
 <i class="fa fa-dot-circle-o" aria-hidden="true"></i> <strong>{{ path.choice.choice_text }}</strong></a> >
+{% endif %}
 
 Confirm Path Removal
 {% endblock %}
@@ -50,8 +46,8 @@ Confirm Path Removal
         </div>
         <div class="w3-cell">
           <div class="w3-card w3-blue w3-padding">
-            <p>Destination Page:</p>
-            <p><strong>{{ path.page.title }}</strong></p>
+            <p class="w3-text-light-grey">Destination Page:</p>
+            <p class="w3-text-light-grey"><strong>{{ path.page.title }}</strong></p>
           </div>
         </div>
       </div>

@@ -86,7 +86,7 @@
         datasets: [
           {% for choice in value %}
           {
-            label: "{{ choice.0 }} ",
+            label: '{{ choice.0|safe }} ',
             backgroundColor: color(colorList[{{ forloop.counter0 }}]).alpha(0.5).rgbString(),
             borderColor: colorList[{{ forloop.counter0 }}],
             borderWidth: 1,

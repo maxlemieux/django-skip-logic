@@ -56,7 +56,11 @@ class PathAdmin(admin.ModelAdmin):
     page__survey.short_description = "Survey"
 
     def choice__page_number(self, obj):
-        return obj.choice.question.page.page_number
+        try:
+            choice = obj.choice
+            return obj.choice.question.page.page_number
+        except:
+            return obj.origin_page.page_number
 
     choice__page_number.short_description = "Origin Page"
 
@@ -65,7 +69,7 @@ class PathAdmin(admin.ModelAdmin):
 
     page__page_number.short_description = "Destination Page Number"
     model = Path
-    list_display = ('id', 'slug', 'choice', 'choice__page_number', 'page', 'page__page_number', 'page__survey')
+    list_display = ('id', 'slug', 'origin_page', 'choice', 'choice__page_number', 'page', 'page__page_number', 'page__survey')
     ordering = ('page__survey', 'page__page_number', )
     list_filter = ('page__survey', )
 

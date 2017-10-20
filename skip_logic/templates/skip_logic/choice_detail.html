@@ -54,7 +54,7 @@ My Surveys</a> >
       <p>This choice has no path. Click the "Add path" button below to add a path leading to a page.</p>
       <div class="w3-container w3-center w3-margin">
         <a class="w3-button-blue w3-large"
-           href="{% url 'skip_logic:path_new' choice_slug=choice.slug %}">
+           href="{% url 'skip_logic:path_new' origin_choice_slug=choice.slug %}">
            <i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add Path...
         </a>
       </div>

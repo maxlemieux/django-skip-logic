@@ -233,7 +233,8 @@ class Page(models.Model):
         blank=True, null=True,
     )
 
-    page_number = models.IntegerField(
+    page_number = models.CharField(
+        max_length=8,
         default=1,
     )
 
@@ -261,7 +262,7 @@ class Choice(models.Model):
     # For choice_text, allow null for questions with just an input field for the answer.
     slug = models.CharField(max_length=50)
     choice_text = models.CharField(max_length=200, blank=True, null=True)
-    choice_number = models.IntegerField(default=1)
+    choice_number = models.CharField(max_length=8, default=1)
     votes = models.IntegerField(default=0)
     choice_image = models.ImageField(upload_to='choice_images/', blank=True, null=True)
     question = models.ForeignKey(
@@ -291,7 +292,7 @@ class Question(models.Model):
     """
     slug = models.CharField(max_length=50)
     question_text = models.CharField(max_length=200, blank=True)
-    question_number = models.IntegerField()
+    question_number = models.CharField(max_length=8, default=1)
     layout_horizontal = models.BooleanField(default=False)
     required = models.BooleanField(default=False)
     page = models.ForeignKey(
@@ -313,14 +314,24 @@ class Question(models.Model):
 
 class Path(models.Model):
     """
-    Branch logic connecting a choice to a page.
+    Branch logic connecting a choice to a page, or a page to page
     """
     slug = models.CharField(max_length=50)
+    # related_name avoids collisions in multiple foreign key
+    # reverse relationships with Page model
+    origin_page = models.ForeignKey(
+        Page,
+        on_delete=models.CASCADE,
+        related_name='origin_page',
+        blank=True, null=True,
+    )
     choice = models.ForeignKey(
         Choice,
         on_delete=models.CASCADE,
-        related_name='path_choice'
+        related_name='path_choice',
+        blank=True, null=True,
     )
+    # destination page
     page = models.ForeignKey(
         Page,
         on_delete=models.CASCADE,
