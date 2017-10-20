@@ -63,12 +63,12 @@ def question_new(request, page_slug):
                                      " for page " + page.title,)
                 return redirect('skip_logic:question_detail', question_slug=question.slug)
         else:
-            new_slug = ''.join(random.choice(string.ascii_uppercase +
-                                             string.ascii_lowercase +
+            new_slug = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase +
                                              string.digits) for _ in range(8))
             if Question.objects.filter(page=page).count() > 0:
                 new_question_number = Question.objects.filter(page=page).\
-                                                       latest('question_number').question_number + 1
+                                                       latest('question_number').question_number
+                new_question_number = int(new_question_number) + 1
             else:
                 new_question_number = 1
             form = QuestionForm(initial={'question_number': new_question_number, 'slug': new_slug})
