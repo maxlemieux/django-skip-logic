@@ -24,6 +24,7 @@
     <p><strong>Call to Action Label:</strong> {{ survey.call_to_action_label }}</p>
     <p><strong>Call to Action Text:</strong> {{ survey.call_to_action_text|safe }}</p>
     <div class="w3-cell-row w3-margin w3-center">
+    {% if survey.page_survey.all|length > 0 %}
       <div class="w3-cell">
         <div class="w3-button w3-hover-shadow w3-green w3-hover-green w3-round-large w3-margin-left w3-border">
           <a style="text-decoration:none;" href="{% url 'skip_logic:page' survey.slug survey.page_survey.all.0.slug %}" class="w3-text-light-grey">
@@ -31,6 +32,7 @@
           </a>
         </div>
       </div>
+    {% endif %}
       <div class="w3-cell">
         <a class="w3-button-blue"
            href="{% url 'skip_logic:survey_edit' survey_slug=survey.slug %}">
